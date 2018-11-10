@@ -1,0 +1,7 @@
+A) main while loop - switch key
+    \
+     \_> pop PREV_PROG <- data stack
+          \
+           \_> 1) is KEY = CURRENT_KEY: ret <- call stack
+            \
+             \_> 2) is 0 = call CURRENT_KEY <- call stack
