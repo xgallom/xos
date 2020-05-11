@@ -6,6 +6,7 @@
 #define XOS_ARCH_I386_KERNEL_VGA_INCLUDE_XOS_VGA_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 namespace vga {
 	namespace Color {
@@ -33,6 +34,11 @@ namespace vga {
 				Offset = 4u,
 				CombinationOffset = Offset << 1u;
 	}
+
+	static constexpr size_t Width = 80, Height = 25, Total = Width * Height;
+	static const uintptr_t BufferAddress = 0xb8000;
+
+	inline uint16_t *Buffer() { return reinterpret_cast<uint16_t *>(BufferAddress); }
 
 	inline constexpr uint8_t ColorCombination(Color::Enum fg, Color::Enum bg)
 	{

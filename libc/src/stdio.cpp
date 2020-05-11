@@ -6,7 +6,9 @@
 #include <stdarg.h>
 
 #ifdef __xos_is_libk
+
 #include <xos/tty.h>
+
 #endif
 
 static void write(const char *string)
@@ -39,14 +41,36 @@ int printf(const char *_Rstr string, ...)
 					++count;
 					break;
 
+				case 'x': {
+					write("0x");
+
+					const unsigned int arg = va_arg(args, unsigned int);
+
+					for(size_t n = 1; n <= sizeof(arg); ++n) {
+						const uint8_t byte = arg >> ((sizeof(arg) - n) << 3);
+
+						const auto printHex = [](uint8_t hex) {
+							putchar("0123456789abcdef"[hex & 0x0f]);
+						};
+
+						printHex(byte >> 4);
+						printHex(byte);
+					}
+
+					++count;
+					break;
+				}
+
 				default:
-					tty::write("ERROR: printf: Unsupported format %");
-					tty::putchar(c);
+					write("ERROR: printf: Unsupported format %");
+					putchar(c);
 
 					va_end(args);
 					return count;
 			}
 		}
+		else
+			putchar(c);
 
 		c = *string++;
 	}

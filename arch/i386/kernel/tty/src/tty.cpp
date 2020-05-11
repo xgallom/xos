@@ -7,13 +7,6 @@
 #include <string.h>
 #include <stdint.h>
 
-namespace vga {
-	namespace {
-		static constexpr size_t Width = 80, Height = 25, Total = Width * Height;
-		static uint16_t *const Buffer = reinterpret_cast<uint16_t *>(0xb8000);
-	}
-}
-
 namespace tty {
 	namespace {
 		size_t s_position;
@@ -32,7 +25,7 @@ namespace tty {
 		const auto empty = vga::Char(' ', s_color);
 
 		size_t count = vga::Total;
-		uint16_t *buffer = vga::Buffer;
+		uint16_t *buffer = vga::Buffer();
 
 		do {
 			*buffer++ = empty;
@@ -51,7 +44,7 @@ namespace tty {
 		if(!length)
 			return;
 
-		uint16_t *buffer = vga::Buffer + s_position;
+		uint16_t *buffer = vga::Buffer() + s_position;
 		const auto color = s_color;
 
 		s_position += length;
