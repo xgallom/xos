@@ -9,12 +9,8 @@
 #include <xos/vga.h>
 #include <stdio.h>
 
-_EXT_C
-
-void kernel_main(void)
+static void printWelcome()
 {
-	tty::initialize();
-
 	tty::setColor(vga::ColorCombination(vga::Color::LightMagenta, vga::Color::LightBlue));
 	tty::write(" xos");
 
@@ -26,6 +22,14 @@ void kernel_main(void)
 
 	tty::setColor(vga::ColorCombination(vga::Color::DarkGray, vga::Color::Black));
 	tty::write(" Copyright Milan Gallo 2020.     ");
+}
+
+_EXT_C
+
+void kernel_main(void)
+{
+	tty::initialize();
+	printWelcome();
 }
 
 _EXT_C_END
