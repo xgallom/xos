@@ -13,19 +13,27 @@ set(CMAKE_C_STANDARD gnu99)
 set(CMAKE_CXX_STANDARD 17)
 
 
-if (DEFINED ARCH)
-    set(XOS_ARCH ${ARCH})
+set(XOS_ARCHITECTURES i386)
+
+if (XOS_ARCH IN_LIST XOS_ARCHITECTURES)
+    message("Found architecture ${XOS_ARCH}")
 else ()
-    set(XOS_ARCH i386)
+    message("Architecture ${XOS_ARCH} is not a valid architecture")
+    message("Available architectures: ${XOS_ARCHITECTURES}")
+    message(FATAL_ERROR "System architecture specified by XOS_ARCH is not valid")
 endif ()
 
 
 set(COMMON_FLAGS "-ffreestanding -Wall -Wextra -Werror")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${COMMON_FLAGS} -nostdlib -T ${CMAKE_SOURCE_DIR}/arch/${XOS_ARCH}/linker.ld")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${COMMON_FLAGS} -nostdlib")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} -fno-exceptions -fno-rtti")
+
 
 add_subdirectory(core)
 add_subdirectory(arch)
 add_subdirectory(libc)
 add_subdirectory(xos)
+
+
+target_link_options(xos PUBLIC "-T${CMAKE_SOURCE_DIR}/arch/${XOS_ARCH}/linker.ld")
