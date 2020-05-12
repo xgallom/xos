@@ -34,6 +34,7 @@ add_subdirectory(core)
 add_subdirectory(arch)
 add_subdirectory(libc)
 add_subdirectory(xos)
+add_subdirectory(image_root)
 
 
 target_link_options(xos PUBLIC "-T${CMAKE_SOURCE_DIR}/arch/${XOS_ARCH}/linker.ld")

@@ -98,7 +98,7 @@ namespace tty {
 			if(toWrite) {
 				const char *const end = str + toWrite;
 				unsafe_write(str, end);
-				
+
 				str = end;
 				length -= toWrite;
 			}
