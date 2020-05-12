@@ -35,7 +35,7 @@ namespace vga {
 				CombinationOffset = Offset << 1u;
 	}
 
-	static constexpr size_t Width = 80, Height = 25, Total = Width * Height;
+	static constexpr uint16_t Width = 80, Height = 25, Total = Width * Height;
 	static const uintptr_t BufferAddress = 0xb8000;
 
 	inline uint16_t *Buffer() { return reinterpret_cast<uint16_t *>(BufferAddress); }

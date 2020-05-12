@@ -13,10 +13,12 @@ namespace tty {
 	void clear();
 
 	void putchar(char c);
+	void newLine();
 	void write(const char *data, size_t size);
 	void write(const char *data);
 
 	void setColor(uint8_t color);
+	void setCursor(uint16_t position);
 }
 
 #endif //_ARCH_i386_KERNEL_TTY_INCLUDE_XOS_TTY_H

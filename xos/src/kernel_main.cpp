@@ -12,16 +12,13 @@
 static void printWelcome()
 {
 	tty::setColor(vga::ColorCombination(vga::Color::LightMagenta, vga::Color::LightBlue));
-	tty::write(" xos");
+	tty::write(" xos v0.0.1 ");
 
-	tty::setColor(vga::ColorCombination(vga::Color::LightMagenta, vga::Color::LightBlue));
-	tty::write(" v0.0.1 ");
+	tty::setColor(vga::ColorCombination(vga::Color::LightMagenta, vga::Color::Black));
+	tty::write(" greets your bitch ass.\n\n");
 
 	tty::setColor(vga::ColorCombination(vga::Color::LightBlue, vga::Color::Black));
-	tty::write(" greets your bitch ass.");
-
-	tty::setColor(vga::ColorCombination(vga::Color::DarkGray, vga::Color::Black));
-	tty::write(" Copyright Milan Gallo 2020.     ");
+	tty::write("Copyright Milan Gallo 2020.");
 }
 
 _EXT_C
