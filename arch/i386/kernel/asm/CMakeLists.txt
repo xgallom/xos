@@ -1,0 +1,2 @@
+add_library(arch_kernel_asm INTERFACE)
+target_include_directories(arch_kernel_asm INTERFACE include)

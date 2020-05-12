@@ -1,3 +1,3 @@
 set(files src/boot.s)
 
-add_library(boot STATIC ${files})
+add_library(arch_boot STATIC ${files})

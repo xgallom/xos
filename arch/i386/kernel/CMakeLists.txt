@@ -1,6 +1,7 @@
+add_subdirectory(asm)
 add_subdirectory(tty)
 add_subdirectory(vga)
 
-add_library(xos_kernel INTERFACE)
+add_library(arch_kernel INTERFACE)
 
-target_link_libraries(xos_kernel INTERFACE xos_kernel_tty xos_kernel_vga)
+target_link_libraries(arch_kernel INTERFACE arch_kernel_asm arch_kernel_tty arch_kernel_vga)
