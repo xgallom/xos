@@ -1,0 +1,25 @@
+<component name="ProjectCodeStyleConfiguration">
+  <code_scheme name="Project" version="173">
+    <option name="AUTODETECT_INDENTS" value="false" />
+    <option name="LINE_SEPARATOR" value="&#10;" />
+    <option name="RIGHT_MARGIN" value="80" />
+    <Objective-C>
+      <option name="INDENT_C_STRUCT_MEMBERS" value="8" />
+      <option name="INDENT_CLASS_MEMBERS" value="8" />
+      <option name="INDENT_INSIDE_CODE_BLOCK" value="8" />
+      <option name="KEEP_STRUCTURES_IN_ONE_LINE" value="true" />
+      <option name="FUNCTION_BRACE_PLACEMENT" value="5" />
+    </Objective-C>
+    <codeStyleSettings language="ObjectiveC">
+      <option name="BLANK_LINES_AROUND_METHOD_IN_INTERFACE" value="0" />
+      <option name="ELSE_ON_NEW_LINE" value="true" />
+      <option name="INDENT_CASE_FROM_SWITCH" value="false" />
+      <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
+      <indentOptions>
+        <option name="INDENT_SIZE" value="8" />
+        <option name="TAB_SIZE" value="8" />
+        <option name="USE_TAB_CHARACTER" value="true" />
+      </indentOptions>
+    </codeStyleSettings>
+  </code_scheme>
+</component>
