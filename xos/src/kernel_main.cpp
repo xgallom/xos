@@ -26,13 +26,14 @@
 
 static void printWelcome()
 {
-	tty::setColor(vga::ColorCombination(vga::Color::LightMagenta, vga::Color::LightBlue));
+	tty::setColor(vga::ColorAttribute(vga::Color::LightMagenta,
+					  vga::Color::LightBlue));
 	tty::write(" xos v0.0.1 ");
 
-	tty::setColor(vga::ColorCombination(vga::Color::LightMagenta, vga::Color::Black));
+	tty::setColor(vga::ColorAttribute(vga::Color::LightMagenta));
 	tty::write(" greets your bitch ass.\n\n");
 
-	tty::setColor(vga::ColorCombination(vga::Color::LightBlue, vga::Color::Black));
+	tty::setColor(vga::ColorAttribute(vga::Color::LightBlue));
 	tty::write("Copyright Milan Gallo 2020.");
 }
 
@@ -42,6 +43,17 @@ void kernel_main(void)
 {
 	tty::initialize();
 	printWelcome();
+
+	tty::setColor(vga::ColorAttribute(vga::Color::LightBrown));
+	printf("\n\nTesting printf:\n");
+
+	printf("\tHex \"%x\" \tString \"%s\"\n\tChar \'%c\'\n",
+	       0xd34db33f,
+	       "This is echoed as well.",
+	       35
+	);
+
+	printf("printf worked until now:\t%a");
 }
 
 _EXT_C_END

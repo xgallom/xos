@@ -24,16 +24,17 @@
 #include <stdint.h>
 
 namespace tty {
-	void initialize();
-	void clear();
+    void initialize();
 
-	void putchar(char c);
-	void newLine();
-	void write(const char *data, size_t size);
-	void write(const char *data);
+    void clear();
+    void putchar(char c);
 
-	void setColor(uint8_t color);
-	void setCursor(uint16_t position);
+    void write(const char *data, size_t size);
+    void write(const char *data);
+
+    void setColor(uint8_t color);
+    void setCursor(uint16_t position);
+    void setCursor(uint8_t x, uint8_t y);
 }
 
 #endif //_ARCH_i386_KERNEL_TTY_INCLUDE_XOS_TTY_H

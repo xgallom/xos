@@ -19,6 +19,8 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdint.h>
+#include <stddef.h>
 
 #ifdef __xos_is_libk
 
@@ -36,59 +38,81 @@ static void write(const char *string)
 #endif
 }
 
+static inline void writeHexLetter(uint8_t hex)
+{
+	putchar("0123456789abcdef"[hex & 0x0f]);
+}
+
+static inline void writeHex(unsigned int value)
+{
+	write("0x");
+
+	for (size_t n = 0; n < sizeof(value); ++n) {
+		const uint8_t byte = value >> (8u * (sizeof(value) - 1));
+
+		writeHexLetter(byte >> 4);
+		writeHexLetter(byte);
+
+		value <<= 8u;
+	}
+}
+
+static inline int format(char c, va_list args)
+{
+	switch (c) {
+	case '%':
+		putchar('%');
+		return 0;
+
+	case 'c':
+		putchar(va_arg(args, int));
+		break;
+
+	case 's':
+		write(va_arg(args, const char *));
+		break;
+
+	case 'x':
+		writeHex(va_arg(args, unsigned int));
+		break;
+
+	default:
+		return c;
+	}
+
+	return 1;
+}
+
 int printf(const char *_Rstr string, ...)
 {
+	char c = *string;
+
+	if (!c)
+		return 0;
+
 	va_list args;
 	va_start(args, string);
 
 	int count = 0;
 
-	char c = *string++;
-	while(c) {
-		if(c == '%') {
-			switch((c = *string++)) {
-				case '%':
-					putchar('%');
-					break;
+	do {
+		if (c == '%') {
+			const int result = format(*++string, args);
 
-				case 's':
-					write(va_arg(args, const char *));
-					++count;
-					break;
+			if (result > 1) {
+				write("ERROR: printf: Unsupported format %");
+				putchar(result);
+				putchar('\n');
 
-				case 'x': {
-					write("0x");
-
-					const unsigned int arg = va_arg(args, unsigned int);
-
-					for(size_t n = 1; n <= sizeof(arg); ++n) {
-						const uint8_t byte = arg >> ((sizeof(arg) - n) << 3);
-
-						const auto printHex = [](uint8_t hex) {
-							putchar("0123456789abcdef"[hex & 0x0f]);
-						};
-
-						printHex(byte >> 4);
-						printHex(byte);
-					}
-
-					++count;
-					break;
-				}
-
-				default:
-					write("ERROR: printf: Unsupported format %");
-					putchar(c);
-
-					va_end(args);
-					return count;
+				va_end(args);
+				return count;
 			}
+
+			count += result;
 		}
 		else
 			putchar(c);
-
-		c = *string++;
-	}
+	} while ((c = *++string));
 
 	va_end(args);
 	return count;
