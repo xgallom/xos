@@ -26,17 +26,38 @@ namespace xos {
     template<typename T>
     inline T *memcpy(T *_Rstr dest, const T *_Rstr src, size_t count)
     {
-	    return reinterpret_cast<T *>(
-		    ::memcpy(dest, src, sizeof(T) * count)
-	    );
+	    if (!count)
+		    return dest;
+
+	    T *_Rstr destBuf = dest;
+
+	    do
+		    *destBuf++ = *src++;
+	    while (--count);
+
+	    return dest;
+    }
+
+    template<typename T>
+    inline T *rmemcpy(T *_Rstr rdest, const T *_Rstr rsrc, size_t count)
+    {
+	    if (!count)
+		    return rdest;
+
+	    do
+		    *--rdest = *--rsrc;
+	    while (--count);
+
+	    return rdest;
     }
 
     template<typename T>
     inline T *memmove(T *dest, const T *src, size_t count)
     {
-	    return reinterpret_cast<T *>(
-		    ::memmove(dest, src, sizeof(T) * count)
-	    );
+	    if (dest < src)
+		    return memcpy<T>(dest, src, count);
+	    else
+		    return rmemcpy<T>(dest + count, src + count, count);
     }
 
     template<typename T>
@@ -52,6 +73,15 @@ namespace xos {
 	    while (--count);
 
 	    return start;
+    }
+
+    template<typename T, size_t N>
+    T *memset(T (&_Rstr dest)[N], T value)
+    {
+	    for (auto &entry : dest)
+		    entry = value;
+
+	    return dest;
     }
 }
 
