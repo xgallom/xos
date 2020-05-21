@@ -26,9 +26,9 @@ target_link_libraries(libk PRIVATE arch_kernel)
 target_compile_definitions(libk PRIVATE __xos_is_libk)
 
 
-add_library(libc STATIC ${files})
-target_include_directories(libc PUBLIC include)
-
-target_link_libraries(libc PUBLIC core)
-
-target_compile_definitions(libc PRIVATE __xos_is_libc)
+#add_library(libc STATIC ${files})
+#target_include_directories(libc PUBLIC include)
+#
+#target_link_libraries(libc PUBLIC core)
+#
+#target_compile_definitions(libc PRIVATE __xos_is_libc)
