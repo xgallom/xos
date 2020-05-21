@@ -33,15 +33,15 @@ namespace vga {
 		Red,
 		Magenta,
 		Brown,
-		LightGray,
+		Gray,
 
 		DarkGray,
-		LightBlue,
-		LightGreen,
-		LightCyan,
-		LightRed,
-		LightMagenta,
-		LightBrown,
+		BrightBlue,
+		BrightGreen,
+		BrightCyan,
+		BrightRed,
+		BrightMagenta,
+		Yellow,
 		White
 	};
 
@@ -57,7 +57,7 @@ namespace vga {
 	    TabLength = 8;
 
     inline constexpr
-    uint8_t ColorAttribute(Color::Enum fg = Color::LightGray,
+    uint8_t ColorAttribute(Color::Enum fg = Color::Gray,
 			   Color::Enum bg = Color::Black)
     {
 	    return fg | (bg << Color::Offset);

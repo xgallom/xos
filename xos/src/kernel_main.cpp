@@ -26,14 +26,14 @@
 
 static void printWelcome()
 {
-	tty::setColor(vga::ColorAttribute(vga::Color::LightMagenta,
-					  vga::Color::LightBlue));
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightMagenta,
+					  vga::Color::BrightBlue));
 	tty::write(" xos v0.0.1 ");
 
-	tty::setColor(vga::ColorAttribute(vga::Color::LightMagenta));
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightMagenta));
 	tty::write(" greets your bitch ass.\n\n");
 
-	tty::setColor(vga::ColorAttribute(vga::Color::LightBlue));
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightBlue));
 	tty::write("Copyright Milan Gallo 2020.");
 }
 
@@ -44,8 +44,9 @@ void kernel_main(void)
 	tty::initialize();
 	printWelcome();
 
-	tty::setColor(vga::ColorAttribute(vga::Color::LightBrown));
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
 	printf("\n\nTesting printf:\n");
+	tty::setColor(vga::ColorAttribute(vga::Color::Gray));
 
 	printf("\tHex \"%x\" \tString \"%s\"\n\tChar \'%c\'\n",
 	       0xd34db33f,
