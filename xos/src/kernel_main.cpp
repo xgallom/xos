@@ -23,6 +23,8 @@
 #include <xos/tty.h>
 #include <xos/vga.h>
 #include <stdio.h>
+#include <xos/port.h>
+#include <xos/pause.h>
 
 static void printWelcome()
 {
@@ -50,7 +52,7 @@ void kernel_main(void)
 
 	int processed = printf(
 		"\t Hex\t\t \"%x\"\n"
-		"\t String\t\t \"%s\"\n"
+		"\t String\t\t %s\n"
 		"\t Char\t\t \'%c\'\n"
 		"\t Int\t\t %d\n"
 		"\t 23\t\t %d\n"
@@ -68,6 +70,27 @@ void kernel_main(void)
 		"printf: %d entries processed (should be 5)\n",
 		processed
 	);
+
+	printf("Testing PS-2 interface:\n");
+	tty::setColor(vga::ColorAttribute(vga::Color::Gray));
+	uint8_t read = '.', oldRead = read;
+	for(;;) {
+		// Spin-loop
+		pause();
+
+		// Read PS-2 output register
+		if ((read = inb(0x60u)) != oldRead) {
+			printf("%d\n", read);
+			if(read == 16)
+				break;
+		}
+
+		oldRead = read;
+	}
+
+	tty::clear();
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightRed));
+	printf("q pressed, returning to hlt\n");
 }
 
 _EXT_C_END
