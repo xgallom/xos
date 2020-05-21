@@ -32,4 +32,16 @@ inline void outb(uint16_t port, uint8_t value)
 	);
 }
 
+inline uint8_t inb(uint16_t port)
+{
+	uint8_t value;
+	asm volatile(
+	"inb %[port], %[value]"
+	: [value]"=a"(value)
+	: [port]"Nd"(port)
+	);
+
+	return value;
+}
+
 #endif //XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PORT_H
