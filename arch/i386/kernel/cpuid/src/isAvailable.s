@@ -23,7 +23,7 @@ isAvailable:
     pushfl
     xorl $0x00200000,  (%esp)
     popfl
-    pushf;
+    pushfl
     pop %eax
     xorl (%esp), %eax
     popfl
