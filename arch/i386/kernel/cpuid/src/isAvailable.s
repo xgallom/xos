@@ -14,9 +14,19 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-file(GLOB_RECURSE files "src/*.cpp" "src/*.s")
-
-add_library(arch_kernel_cpuid STATIC ${files})
-target_include_directories(arch_kernel_cpuid PUBLIC include)
-
-target_link_libraries(arch_kernel_cpuid PRIVATE libk)
+.file "isAvailable.s"
+.section .text
+.global isAvailable
+.type isAvailable, @function
+isAvailable:
+    pushfl
+    pushfl
+    xorl $0x00200000,  (%esp)
+    popfl
+    pushf;
+    pop %eax
+    xorl (%esp), %eax
+    popfl
+    andl $0x00200000, %eax
+    ret
+.size isAvailable, . - isAvailable
