@@ -51,8 +51,6 @@ static void write(const char *string, size_t length)
 
 static inline void writeHex(unsigned int value)
 {
-	write("0x");
-
 	constexpr size_t
 		BufferSize = sizeof(value) * 2,
 		MSBOffset = 8u * (sizeof(value) - 1);
