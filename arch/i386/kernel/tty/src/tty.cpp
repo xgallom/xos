@@ -23,29 +23,28 @@
 #include <stdint.h>
 
 namespace tty {
-    // Frame buffer is uint16_t, because vga maps attribute plane
-    //  interwoven with character plane.
-    // Even byte is attribute, and odd byte is character of specific
-    //  screen position, so screen characters can map to words that
-    //  have attribute in high byte and character in low byte.
+    // Frame buffer is uint16_t, because vga maps attribute plane interwoven
+    //  with character plane.
+    // Even byte is attribute, and odd byte is character of specific screen
+    //  position, so screen characters can map to words that have attribute in
+    //  high byte and character in low byte.
 
     // Frame buffer has one more empty row.
-    // On having full buffer, whole screen is copied one row up,
-    //  along with the spare row, which fills the last row with
-    //  empty characters
+    // On having full buffer, whole screen is copied one row up, along with the
+    //  spare row, which fills the last row with empty characters
     static uint16_t s_frameBuffer[vga::Total + vga::Width] = {};
 
     static uint16_t s_position = 0;
 
-    // Attributes are stored in the higher byte so they don't have
-    //  to be shifted on every write, only on every setColor.
+    // Attributes are stored in the higher byte so they don't have to be shifted
+    //  on every write, only on every setColor.
     static uint16_t s_attributeMask = 0;
 
     static void internal_putchar(char c)
     {
 	    switch (c) {
 	    case '\n':
-		    // Add remaining offset to end of current row to position:
+		    // Add remaining offset to end of current row to position
 		    s_position += vga::Width - s_position % vga::Width;
 		    break;
 
@@ -58,13 +57,13 @@ namespace tty {
 	    }
 
 	    if (s_position == vga::Total) {
-		    // On overflow we move over next row of the
-		    //  frame buffer along with the spare empty row.
+		    // On overflow next row of the frame buffer is moved one row
+		    //  up, along with the spare empty row.
 		    s_position -= vga::Width;
 
-		    xos::memmove(
-			    s_frameBuffer,
-			    s_frameBuffer + vga::Width,
+		    xos::rmemcpy(
+			    s_frameBuffer + vga::Total,
+			    s_frameBuffer + vga::Width + vga::Total,
 			    vga::Total
 		    );
 	    }
@@ -74,15 +73,11 @@ namespace tty {
     {
 	    setColor(vga::ColorAttribute());
 	    clear();
-
-	    vga::renderFrameBuffer(s_frameBuffer);
     }
 
     void clear()
     {
-	    // Clear whole frame buffer, along with the extended row
-	    for (auto &character : s_frameBuffer)
-		    character = s_attributeMask;
+	    xos::memset(s_frameBuffer, s_attributeMask);
 
 	    vga::setCursorPosition((s_position = 0));
 	    vga::renderFrameBuffer(s_frameBuffer);

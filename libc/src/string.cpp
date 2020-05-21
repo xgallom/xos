@@ -158,7 +158,7 @@ char *strncpy(char *_Rstr dest, const char *_Rstr src, size_t length)
 
 size_t strlen(const char *str)
 {
-	if(!*str)
+	if (!*str)
 		return 0;
 
 	size_t result = 0;
