@@ -53,17 +53,17 @@ namespace tty {
 		    break;
 
 	    default:
-		    s_frameBuffer[s_position++] = s_attributeMask | uint16_t(c);
+		    s_frameBuffer[s_position++] = s_attributeMask | uint8_t(c);
 	    }
 
-	    if (s_position == vga::Total) {
+	    if (s_position >= vga::Total) {
 		    // On overflow next row of the frame buffer is moved one row
 		    //  up, along with the spare empty row.
 		    s_position -= vga::Width;
 
-		    xos::rmemcpy(
-			    s_frameBuffer + vga::Total,
-			    s_frameBuffer + vga::Width + vga::Total,
+		    xos::memmove(
+			    s_frameBuffer,
+			    s_frameBuffer + vga::Width,
 			    vga::Total
 		    );
 	    }
