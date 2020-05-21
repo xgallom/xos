@@ -48,13 +48,26 @@ void kernel_main(void)
 	printf("\n\nTesting printf:\n");
 	tty::setColor(vga::ColorAttribute(vga::Color::Gray));
 
-	printf("\tHex \"%x\" \tString \"%s\"\n\tChar \'%c\'\n",
-	       0xd34db33f,
-	       "This is echoed as well.",
-	       35
+	int processed = printf(
+		"\t Hex\t\t \"%x\"\n"
+		"\t String\t\t \"%s\"\n"
+		"\t Char\t\t \'%c\'\n"
+		"\t Int\t\t %d\n"
+		"\t 23\t\t %d\n"
+		"\t Invalid\t %a\n",
+		0xdeadb33f,
+		"This is echoed as well.",
+		'#',
+		103000,
+		23,
+		'x'
 	);
 
-	printf("printf worked until now:\t%a");
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
+	printf(
+		"printf: %d entries processed (should be 5)\n",
+		processed
+	);
 }
 
 _EXT_C_END

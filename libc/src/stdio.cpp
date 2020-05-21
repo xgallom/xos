@@ -25,6 +25,7 @@
 #ifdef __xos_is_libk
 
 #include <xos/tty.h>
+#include <xos/div64.h>
 
 #endif
 
@@ -38,26 +39,82 @@ static void write(const char *string)
 #endif
 }
 
-static inline void writeHexLetter(uint8_t hex)
+static void write(const char *string, size_t length)
 {
-	putchar("0123456789abcdef"[hex & 0x0f]);
+#ifdef __xos_is_libk
+	tty::write(string, length);
+#else
+	// TODO: Implement system call
+	return EOF;
+#endif
 }
 
 static inline void writeHex(unsigned int value)
 {
 	write("0x");
 
-	for (size_t n = 0; n < sizeof(value); ++n) {
-		const uint8_t byte = value >> (8u * (sizeof(value) - 1));
+	constexpr size_t
+		BufferSize = sizeof(value) * 2,
+		MSBOffset = 8u * (sizeof(value) - 1);
 
-		writeHexLetter(byte >> 4);
-		writeHexLetter(byte);
+	static constexpr char hexLetter[] = "0123456789abcdef";
 
+	uint16_t buffer[BufferSize];
+
+	for (auto &character : buffer) {
+		// Take highest byte
+		const uint8_t byte = value >> MSBOffset;
+
+		// Fucking little-endian
+		character =
+			(hexLetter[byte & 0x0fu] << 8u) |
+			hexLetter[byte >> 4u];
+
+		// Move next byte to the top
 		value <<= 8u;
 	}
+
+	write(reinterpret_cast<char *>(buffer), BufferSize);
 }
 
-static inline int format(char c, va_list args)
+static inline void writeDec(int64_t value)
+{
+	if (value < 0) {
+		putchar('-');
+		value = -value;
+	}
+	else if (__builtin_expect(value == 23, 0)) {
+		// TODO: !IMPORTANT! Nezabudnut na macku
+		write("=(*.* = )~~");
+		return;
+	}
+
+	constexpr size_t
+	// Length of string holding maximum possible value of uint64_t
+		BufferSize = sizeof("18446744073709551615\0"),
+	// Index of last character
+		BufferLast = BufferSize - 1;
+
+
+	// Insertion goes in reverse so the divisions results are correctly
+	//  ordered (first remainder is the lowest decimal)
+	char
+		buffer[BufferSize],
+		*_Rstr buf = buffer + BufferLast;
+
+	*buf = '\0';
+
+	do {
+		uint32_t remainder;
+
+		value = div64u(value, 10, remainder);
+		*--buf = '0' + char(remainder);
+	} while (value);
+
+	write(buf);
+}
+
+static inline int format(char c, va_list &args)
 {
 	switch (c) {
 	case '%':
@@ -66,28 +123,30 @@ static inline int format(char c, va_list args)
 
 	case 'c':
 		putchar(va_arg(args, int));
-		break;
+		return 1;
 
 	case 's':
 		write(va_arg(args, const char *));
-		break;
+		return 1;
 
 	case 'x':
 		writeHex(va_arg(args, unsigned int));
-		break;
+		return 1;
+
+	case 'd':
+		writeDec(va_arg(args, unsigned int));
+		return 1;
 
 	default:
-		return c;
+		return -1;
 	}
-
-	return 1;
 }
 
 int printf(const char *_Rstr string, ...)
 {
 	char c = *string;
 
-	if (!c)
+	if (__builtin_expect(!c, 0))
 		return 0;
 
 	va_list args;
@@ -97,18 +156,19 @@ int printf(const char *_Rstr string, ...)
 
 	do {
 		if (c == '%') {
-			const int result = format(*++string, args);
+			const char modifier = *++string;
+			const int result = format(modifier, args);
 
-			if (result > 1) {
-				write("ERROR: printf: Unsupported format %");
-				putchar(result);
-				putchar('\n');
-
-				va_end(args);
-				return count;
+			if (__builtin_expect(result >= 0, 1)) {
+				count += result;
+				continue;
 			}
 
-			count += result;
+			write("ERROR: printf: Unsupported format %");
+			putchar(modifier);
+			putchar('\n');
+
+			break;
 		}
 		else
 			putchar(c);
