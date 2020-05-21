@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <xos/port.h>
 #include <xos/pause.h>
+#include <xos/cpuid.h>
 
 static void printWelcome()
 {
@@ -71,17 +72,51 @@ void kernel_main(void)
 		processed
 	);
 
-	printf("Testing PS-2 interface:\n");
+
+	printf(
+		"\nInitializing cpuid: %s",
+		cpuid::initialize() ?
+		"cpuid is available\nCpuid results:\n" :
+		"cpuid is not available\n"
+	);
+
 	tty::setColor(vga::ColorAttribute(vga::Color::Gray));
-	uint8_t read = '.', oldRead = read;
-	for(;;) {
+	for (uint8_t request = 0;
+	     request < cpuid::RequestType::Count;
+	     ++request) {
+		const auto *const result = cpuid::cpuid(
+			static_cast<cpuid::RequestType::Enum>(request)
+		);
+
+		printf("%d: %x%x%x%x \"",
+		       request,
+		       result[0],
+		       result[1],
+		       result[2],
+		       result[3]
+		);
+		tty::write(
+			reinterpret_cast<const char *>(result),
+			cpuid::ResultByteLength
+		);
+		printf("\"\n");
+	}
+
+
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
+	printf("\nTesting PS-2 interface:\n");
+
+	tty::setColor(vga::ColorAttribute(vga::Color::Gray));
+	uint8_t read = '.', oldRead = inb(0x60u);
+
+	for (;;) {
 		// Spin-loop
 		pause();
 
 		// Read PS-2 output register
 		if ((read = inb(0x60u)) != oldRead) {
 			printf("%d\n", read);
-			if(read == 16)
+			if (read == 16)
 				break;
 		}
 
