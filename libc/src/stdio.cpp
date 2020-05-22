@@ -135,6 +135,10 @@ static inline int format(char c, va_list &args)
 		writeDec(va_arg(args, unsigned int));
 		return 1;
 
+	case 'b':
+		write(va_arg(args, unsigned int) ? "true" : "false");
+		return 1;
+
 	default:
 		return -1;
 	}
