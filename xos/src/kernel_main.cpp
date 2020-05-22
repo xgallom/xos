@@ -40,6 +40,31 @@ static void printWelcome()
 	tty::write("Copyright Milan Gallo 2020.");
 }
 
+// TODO: Move to arch/kernel/ps2
+static uint8_t getchar()
+{
+	uint8_t
+		read,
+		firstRead = 0,
+		oldRead = inb(0x60u);
+
+	for (;;) {
+		// Spin-loop
+		pause();
+
+		// Read PS-2 output register
+		if ((read = inb(0x60u)) != oldRead) {
+			// Wait for release
+			if (firstRead)
+				return firstRead;
+			else
+				firstRead = read;
+		}
+
+		oldRead = read;
+	}
+}
+
 _EXT_C
 
 void kernel_main(void)
@@ -49,11 +74,11 @@ void kernel_main(void)
 
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
 	printf("\n\nTesting printf:\n");
-	tty::setColor(vga::ColorAttribute(vga::Color::Gray));
+	tty::setColor(vga::ColorAttribute());
 
 	int processed = printf(
-		"\t Hex\t\t \"%x\"\n"
-		"\t String\t\t %s\n"
+		"\t Hex\t\t 0x%x\n"
+		"\t String\t\t \"%s\"\n"
 		"\t Char\t\t \'%c\'\n"
 		"\t Int\t\t %d\n"
 		"\t 23\t\t %d\n"
@@ -72,56 +97,119 @@ void kernel_main(void)
 		processed
 	);
 
+	getchar();
+
+
+	bool hasCpuid = cpuid::initialize();
 
 	printf(
-		"\nInitializing cpuid: %s",
-		cpuid::initialize() ?
-		"cpuid is available\nCpuid results:\n" :
-		"cpuid is not available\n"
+		"\nInitializing Cpuid: %s",
+		hasCpuid ?
+		"Cpuid is available\nCpuid results:\n" :
+		"Cpuid is not available\n"
 	);
 
-	tty::setColor(vga::ColorAttribute(vga::Color::Gray));
-	for (uint8_t request = 0;
-	     request < cpuid::RequestType::Count;
-	     ++request) {
-		const auto *const result = cpuid::entry(
-			static_cast<cpuid::RequestType::Enum>(request)
-		);
+	if (hasCpuid) {
+		for (uint8_t request = 0;
+		     request < cpuid::RequestType::Count;
+		     ++request) {
+			const auto requestType =
+				static_cast<cpuid::RequestType::Enum>(
+					request
+				);
 
-		printf("%d: %x%x%x%x \"",
-		       request,
-		       result[0],
-		       result[1],
-		       result[2],
-		       result[3]
-		);
-		tty::write(
-			reinterpret_cast<const char *>(result),
-			cpuid::ResultByteLength
-		);
-		printf("\"\n");
+			const auto *const result = cpuid::entry(requestType);
+
+			tty::setColor(
+				vga::ColorAttribute(vga::Color::BrightBlue)
+			);
+			printf(
+				"%x %s:\n",
+				cpuid::entryRequest(requestType),
+				cpuid::entryName(requestType)
+			);
+
+			tty::setColor(vga::ColorAttribute());
+			printf(
+				"\t  %x %x %x %x\t\"",
+				result[0],
+				result[1],
+				result[2],
+				result[3]
+			);
+			tty::write(
+				reinterpret_cast<const char *>(result),
+				cpuid::ResultByteLength
+			);
+			printf("\"\n");
+		}
+
+		getchar();
+
+
+		tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
+		printf("\nCpuid Features:\n");
+		for (uint8_t feature = 0;
+		     feature < 32;
+		     ++feature) {
+			if (!(feature & 0x07u))
+				getchar();
+
+			const auto featureType =
+				static_cast<cpuid::FeatureType::Enum>(
+					feature
+				);
+
+			const auto result = cpuid::feature(featureType);
+
+			tty::setColor(
+				vga::ColorAttribute(vga::Color::BrightBlue)
+			);
+			printf("%x %s:\n",
+			       featureType,
+			       cpuid::featureName(featureType)
+
+			);
+			tty::setColor(vga::ColorAttribute());
+			printf("\t  %b\n", result);
+		}
+
+		for (uint8_t feature = 0;
+		     feature < 32;
+		     ++feature) {
+			if (!(feature & 0x07u))
+				getchar();
+
+			const auto featureType =
+				static_cast<cpuid::FeatureType::Enum>(
+					cpuid::FeatureType::EdxMask | feature
+				);
+
+			const auto result = cpuid::feature(featureType);
+
+			tty::setColor(
+				vga::ColorAttribute(vga::Color::BrightBlue)
+			);
+			printf("%x %s:\n",
+			       featureType,
+			       cpuid::featureName(featureType)
+
+			);
+			tty::setColor(vga::ColorAttribute());
+			printf("\t  %b\n", result);
+		}
 	}
+
+	getchar();
 
 
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
 	printf("\nTesting PS-2 interface:\n");
 
 	tty::setColor(vga::ColorAttribute(vga::Color::Gray));
-	uint8_t read = '.', oldRead = inb(0x60u);
-
-	for (;;) {
-		// Spin-loop
-		pause();
-
-		// Read PS-2 output register
-		if ((read = inb(0x60u)) != oldRead) {
-			printf("%d\n", read);
-			if (read == 16)
-				break;
-		}
-
-		oldRead = read;
-	}
+	uint8_t character;
+	while ((character = getchar()) != 16)
+		printf("%d ", character);
 
 	tty::clear();
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightRed));
