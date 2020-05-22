@@ -17,8 +17,8 @@
 // Created by xgallom on 5/11/20.
 //
 
-#ifndef XOS_XOS_SRC_COMPILER_CHECKS_H
-#define XOS_XOS_SRC_COMPILER_CHECKS_H
+#ifndef _XOS_XOS_SRC_COMPILER_CHECKS_H
+#define _XOS_XOS_SRC_COMPILER_CHECKS_H
 
 /* Check if the compiler thinks you are targeting the wrong operating system. */
 #if defined(__linux__) || \
@@ -39,4 +39,4 @@
 
 #endif
 
-#endif //XOS_XOS_SRC_COMPILER_CHECKS_H
+#endif //_XOS_XOS_SRC_COMPILER_CHECKS_H

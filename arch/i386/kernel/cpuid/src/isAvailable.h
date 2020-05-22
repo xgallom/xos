@@ -17,8 +17,8 @@
 // Created by xgallom on 5/22/20.
 //
 
-#ifndef XOS_ISAVAILABLE_H
-#define XOS_ISAVAILABLE_H
+#ifndef _XOS_ARCH_I386_KERNEL_CPUID_SRC_ISAVAILABLE_H
+#define _XOS_ARCH_I386_KERNEL_CPUID_SRC_ISAVAILABLE_H
 
 #include <xos/ext_c.h>
 
@@ -28,4 +28,4 @@ int isAvailable(void);
 
 _EXT_C_END
 
-#endif //XOS_ISAVAILABLE_H
+#endif //_XOS_ARCH_I386_KERNEL_CPUID_SRC_ISAVAILABLE_H

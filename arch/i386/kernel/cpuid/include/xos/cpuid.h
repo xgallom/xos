@@ -17,8 +17,8 @@
 // Created by xgallom on 5/22/20.
 //
 
-#ifndef XOS_CPUID_H
-#define XOS_CPUID_H
+#ifndef _XOS_ARCH_I386_KERNEL_CPUID_INCLUDE_XOS_CPUID_H
+#define _XOS_ARCH_I386_KERNEL_CPUID_INCLUDE_XOS_CPUID_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -117,4 +117,4 @@ namespace cpuid {
     bool feature(FeatureType::Enum feature);
 }
 
-#endif //XOS_CPUID_H
+#endif //_XOS_ARCH_I386_KERNEL_CPUID_INCLUDE_XOS_CPUID_H

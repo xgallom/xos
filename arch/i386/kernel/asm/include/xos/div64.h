@@ -17,8 +17,8 @@
 // Created by xgallom on 5/21/20.
 //
 
-#ifndef XOS_DIV64_H
-#define XOS_DIV64_H
+#ifndef _XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_DIV64_H
+#define _XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_DIV64_H
 
 /** TODO: WHAT THE FUCK TORVALDS */
 /*
@@ -88,4 +88,4 @@ inline uint64_t div64u(
 	return buffer.x;
 }
 
-#endif //XOS_DIV64_H
+#endif //_XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_DIV64_H

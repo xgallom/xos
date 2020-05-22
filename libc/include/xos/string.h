@@ -17,8 +17,8 @@
 // Created by xgallom on 5/20/20.
 //
 
-#ifndef XOS_LIBC_INCLUDE_XOS_STRING_H
-#define XOS_LIBC_INCLUDE_XOS_STRING_H
+#ifndef _XOS_LIBC_INCLUDE_XOS_STRING_H
+#define _XOS_LIBC_INCLUDE_XOS_STRING_H
 
 #include "../string.h"
 
@@ -85,4 +85,4 @@ namespace xos {
     }
 }
 
-#endif //XOS_LIBC_INCLUDE_XOS_STRING_H
+#endif //_XOS_LIBC_INCLUDE_XOS_STRING_H

@@ -17,8 +17,8 @@
 // Created by xgallom on 5/11/20.
 //
 
-#ifndef XOS_ARCH_I386_KERNEL_VGA_INCLUDE_XOS_VGA_H
-#define XOS_ARCH_I386_KERNEL_VGA_INCLUDE_XOS_VGA_H
+#ifndef _XOS_ARCH_I386_KERNEL_VGA_INCLUDE_XOS_VGA_H
+#define _XOS_ARCH_I386_KERNEL_VGA_INCLUDE_XOS_VGA_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -67,4 +67,4 @@ namespace vga {
     void setCursorPosition(uint16_t position);
 }
 
-#endif //XOS_ARCH_I386_KERNEL_VGA_INCLUDE_XOS_VGA_H
+#endif //_XOS_ARCH_I386_KERNEL_VGA_INCLUDE_XOS_VGA_H

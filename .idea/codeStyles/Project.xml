@@ -9,6 +9,7 @@
       <option name="INDENT_INSIDE_CODE_BLOCK" value="8" />
       <option name="KEEP_STRUCTURES_IN_ONE_LINE" value="true" />
       <option name="FUNCTION_BRACE_PLACEMENT" value="5" />
+      <option name="HEADER_GUARD_STYLE_PATTERN" value="_${PROJECT_NAME}_${PROJECT_REL_PATH}_${FILE_NAME}_${EXT}" />
     </Objective-C>
     <codeStyleSettings language="ObjectiveC">
       <option name="BLANK_LINES_AROUND_METHOD_IN_INTERFACE" value="0" />

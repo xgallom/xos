@@ -17,9 +17,9 @@
 // Created by xgallom on 5/22/20.
 //
 
-#ifndef XOS_PAUSE_H
-#define XOS_PAUSE_H
+#ifndef _XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PAUSE_H
+#define _XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PAUSE_H
 
 inline void pause() { asm volatile("pause"); }
 
-#endif //XOS_PAUSE_H
+#endif //_XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PAUSE_H

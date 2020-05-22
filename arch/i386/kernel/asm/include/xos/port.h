@@ -17,8 +17,8 @@
 // Created by xgallom on 5/12/20.
 //
 
-#ifndef XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PORT_H
-#define XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PORT_H
+#ifndef _XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PORT_H
+#define _XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PORT_H
 
 #include <stdint.h>
 
@@ -44,4 +44,4 @@ inline uint8_t inb(uint16_t port)
 	return value;
 }
 
-#endif //XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PORT_H
+#endif //_XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PORT_H
