@@ -41,13 +41,80 @@ namespace cpuid {
 	static constexpr size_t Count = IntelBrandStringEnd + 1;
     }
 
+    namespace FeatureType {
+	static constexpr uint8_t
+		EdxMask = 0x80u,
+		BitOffsetMask = uint8_t(~EdxMask);
+
+	enum Enum : uint8_t {
+		Sse3 = 0,
+		PclMul,
+		Dtes64,
+		Monitor,
+		DsCpl,
+		Vmx,
+		Smx,
+		Est,
+		Tm2,
+		Ssse3,
+		Cid,
+		Fma,
+		Cx16,
+		Etprd,
+		Pdcm,
+		PciDe,
+		Dca,
+		Sse4_1,
+		Sse4_2,
+		X2Apic,
+		MovBe,
+		PopCnt,
+		Aes,
+		XSave,
+		OsxSave,
+		Avx,
+
+		Fpu = EdxMask,
+		Vme,
+		De,
+		Pse,
+		Tsc,
+		Msr,
+		Pae,
+		Mce,
+		Cx8,
+		Apic,
+		Sep,
+		Mtrr,
+		Pge,
+		Mca,
+		CMov,
+		Pat,
+		Pse36,
+		Psn,
+		Clf,
+		Dtes,
+		Acpi,
+		Mmx,
+		Fxsr,
+		Sse,
+		Sse2,
+		Ss,
+		Htt,
+		Tm1,
+		IA64,
+		Pbe,
+	};
+    }
+
     static constexpr size_t
 	    ResultLength = 4,
 	    ResultByteLength = sizeof(uint32_t) * ResultLength;
 
     bool initialize();
 
-    const uint32_t *cpuid(RequestType::Enum request);
+    const uint32_t *entry(RequestType::Enum request);
+    bool feature(FeatureType::Enum feature);
 }
 
 #endif //XOS_CPUID_H

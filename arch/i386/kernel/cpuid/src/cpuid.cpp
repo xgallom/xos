@@ -35,13 +35,27 @@ namespace cpuid {
 
     static uint32_t s_result[RequestType::Count][ResultLength] = {};
 
-    static void loadCpuid(RequestType::Enum request)
+    static void vendorString(RequestType::Enum request)
     {
 	    uint32_t *result = s_result[request];
 
 	    asm volatile(
 	    "cpuid"
-	    : "=a"(*result), "=b"(*(result + 1)), "=c"(*(result + 2)),
+	    : "=a"(*(result + 3)), "=b"(*(result)), "=c"(*(result + 2)),
+	    "=d"(*(result + 1))
+	    : "a"(RequestTypeMap[request])
+	    );
+
+	    result[3] = 0;
+    }
+
+    static void other(RequestType::Enum request)
+    {
+	    uint32_t *result = s_result[request];
+
+	    asm volatile(
+	    "cpuid"
+	    : "=a"(*(result)), "=b"(*(result + 1)), "=c"(*(result + 2)),
 	    "=d"(*(result + 3))
 	    : "a"(RequestTypeMap[request])
 	    );
@@ -52,14 +66,33 @@ namespace cpuid {
 	    if (!isAvailable())
 		    return false;
 
-	    for(uint8_t request = 0; request < RequestType::Count; ++request)
-	    	loadCpuid(static_cast<RequestType::Enum>(request));
+	    vendorString(RequestType::GetVendorString);
+	    other(RequestType::GetFeatures);
+	    other(RequestType::GetTLB);
+	    other(RequestType::GetSerial);
+
+	    vendorString(RequestType::IntelExtended);
+	    other(RequestType::IntelFeatures);
+	    other(RequestType::IntelBrandString);
+	    other(RequestType::IntelBrandStringMore);
+	    vendorString(RequestType::IntelBrandStringEnd);
 
 	    return true;
     }
 
-    const uint32_t *cpuid(RequestType::Enum request)
+    const uint32_t *entry(RequestType::Enum request)
     {
 	    return s_result[request];
+    }
+
+    bool feature(FeatureType::Enum feature)
+    {
+	    const bool isEdx = (feature & FeatureType::EdxMask) != 0u;
+	    const uint8_t offset = 2 + isEdx;
+	    const uint32_t
+		    entry = s_result[RequestType::GetFeatures][offset],
+		    featureMask = 1u << (feature & FeatureType::BitOffsetMask);
+
+	    return (entry & featureMask) != 0;
     }
 }

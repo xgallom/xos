@@ -84,7 +84,7 @@ void kernel_main(void)
 	for (uint8_t request = 0;
 	     request < cpuid::RequestType::Count;
 	     ++request) {
-		const auto *const result = cpuid::cpuid(
+		const auto *const result = cpuid::entry(
 			static_cast<cpuid::RequestType::Enum>(request)
 		);
 
