@@ -32,7 +32,7 @@ namespace cpuid {
 	    requestOther(RequestType::GetTLB);
 	    requestOther(RequestType::GetSerial);
 
-	    requestOther(RequestType::IntelExtended);
+	    requestVendorString(RequestType::IntelExtended);
 	    requestOther(RequestType::IntelFeatures);
 	    requestOther(RequestType::IntelBrandString);
 	    requestOther(RequestType::IntelBrandStringMore);
