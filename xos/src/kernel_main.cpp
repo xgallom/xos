@@ -22,7 +22,7 @@
 #include <xos/ext_c.h>
 #include <xos/tty.h>
 #include <xos/vga.h>
-#include <stdio.h>
+#include <xos/stdio.h>
 #include <xos/port.h>
 #include <xos/pause.h>
 #include <xos/cpuid.h>
@@ -73,16 +73,16 @@ void kernel_main(void)
 	printWelcome();
 
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
-	printf("\n\nTesting printf:\n");
+	xos::printf("\n\nTesting printf:\n");
 	tty::setColor(vga::ColorAttribute());
 
-	int processed = printf(
-		"\t Hex\t\t 0x%x\n"
-		"\t String\t\t \"%s\"\n"
-		"\t Char\t\t \'%c\'\n"
-		"\t Int\t\t %d\n"
-		"\t 23\t\t %d\n"
-		"\t Invalid\t %a\n",
+	int processed = xos::printf(
+		"\t Hex\t\t 0x{x}\n"
+		"\t String\t\t \"{}\"\n"
+		"\t Char\t\t \'{}\'\n"
+		"\t Int\t\t {}\n"
+		"\t 23\t\t {}\n"
+		"\t Invalid\t {}\n",
 		0xdeadb33f,
 		"This is echoed as well.",
 		'#',
@@ -92,8 +92,8 @@ void kernel_main(void)
 	);
 
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
-	printf(
-		"printf: %d entries processed (should be 5)\n",
+	xos::printf(
+		"printf: {} entries processed (should be 5)\n",
 		processed
 	);
 
@@ -102,8 +102,8 @@ void kernel_main(void)
 
 	bool hasCpuid = cpuid::initialize();
 
-	printf(
-		"\nInitializing Cpuid: %s",
+	xos::printf(
+		"\nInitializing Cpuid: {}",
 		hasCpuid ?
 		"Cpuid is available\nCpuid results:\n" :
 		"Cpuid is not available\n"
@@ -123,32 +123,32 @@ void kernel_main(void)
 			tty::setColor(
 				vga::ColorAttribute(vga::Color::BrightBlue)
 			);
-			printf(
-				"%x %s:\n",
+			xos::printf(
+				"{x} {}:\n",
 				cpuid::entryRequest(requestType),
 				cpuid::entryName(requestType)
 			);
 
 			tty::setColor(vga::ColorAttribute());
-			printf(
-				"\t  %x %x %x %x\t\"",
+			xos::printf(
+				"\t  {x} {x} {x} {x}\t\"",
 				result[0],
 				result[1],
 				result[2],
 				result[3]
 			);
-			tty::write(
+			xos::write(
 				reinterpret_cast<const char *>(result),
 				cpuid::ResultByteLength
 			);
-			printf("\"\n");
+			xos::printf("\"\n");
 		}
 
 		getchar();
 
 
 		tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
-		printf("\nCpuid Features:\n");
+		xos::printf("\nCpuid Features:\n");
 		for (uint8_t feature = 0;
 		     feature < 32;
 		     ++feature) {
@@ -165,13 +165,13 @@ void kernel_main(void)
 			tty::setColor(
 				vga::ColorAttribute(vga::Color::BrightBlue)
 			);
-			printf("%x %s:\n",
-			       featureType,
-			       cpuid::featureName(featureType)
+			xos::printf("{x} {}:\n",
+				    uint8_t(featureType),
+				    cpuid::featureName(featureType)
 
 			);
 			tty::setColor(vga::ColorAttribute());
-			printf("\t  %b\n", result);
+			xos::printf("\t  {}\n", result);
 		}
 
 		for (uint8_t feature = 0;
@@ -190,13 +190,13 @@ void kernel_main(void)
 			tty::setColor(
 				vga::ColorAttribute(vga::Color::BrightBlue)
 			);
-			printf("%x %s:\n",
-			       featureType,
-			       cpuid::featureName(featureType)
+			xos::printf("{x} {}:\n",
+				    uint8_t(featureType),
+				    cpuid::featureName(featureType)
 
 			);
 			tty::setColor(vga::ColorAttribute());
-			printf("\t  %b\n", result);
+			xos::printf("\t  {}\n", result);
 		}
 	}
 
@@ -204,16 +204,16 @@ void kernel_main(void)
 
 
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
-	printf("\nTesting PS-2 interface:\n");
+	xos::printf("\nTesting PS-2 interface:\n");
 
 	tty::setColor(vga::ColorAttribute(vga::Color::Gray));
 	uint8_t character;
 	while ((character = getchar()) != 16)
-		printf("%d ", character);
+		xos::printf("{} ", character);
 
 	tty::clear();
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightRed));
-	printf("q pressed, returning to hlt\n");
+	xos::printf("q pressed, returning to hlt\n");
 }
 
 _EXT_C_END
