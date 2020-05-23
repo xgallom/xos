@@ -21,127 +21,114 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <xos/write_decl.h>
 
-#ifdef __xos_is_libk
+static constexpr size_t FormatBufferLength = 3;
 
-#include <xos/tty.h>
-#include <xos/div64.h>
 
-#endif
-
-static void write(const char *string)
+static inline int format(
+	const char *_Rstr &string,
+	va_list &args,
+	char *_Rstr buffer)
 {
-#ifdef __xos_is_libk
-	tty::write(string);
-#else
-	// TODO: Implement system call
-	return EOF;
-#endif
-}
+	uint8_t count = 0;
 
-static void write(const char *string, size_t length)
-{
-#ifdef __xos_is_libk
-	tty::write(string, length);
-#else
-	// TODO: Implement system call
-	return EOF;
-#endif
-}
+	for (; count < FormatBufferLength; (void) (++buffer, ++count)) {
+		switch (*buffer = *++string) {
+		case '%':
+			if (count > 0)
+				return -1;
+			putchar('%');
+			return 0;
 
-static inline void writeHex(unsigned int value)
-{
-	constexpr size_t
-		BufferSize = sizeof(value) * 2,
-		MSBOffset = 8u * (sizeof(value) - 1);
+		case 'c':
+			if (count > 0)
+				return -1;
+			putchar(va_arg(args, int));
+			return 1;
 
-	static constexpr char hexLetter[] = "0123456789abcdef";
+		case 's':
+			if (count > 0)
+				return -1;
+			xos::write(va_arg(args, const char *));
+			return 1;
 
-	uint16_t buffer[BufferSize];
+		case 'x': {
+			switch (count) {
+			case 0:
+				xos::writeHex(va_arg(args, unsigned int));
+				return 1;
 
-	for (auto &character : buffer) {
-		// Take highest byte
-		const uint8_t byte = value >> MSBOffset;
+			case 1:
+				xos::writeHex(va_arg(args, unsigned long));
+				return 1;
 
-		// Fucking little-endian
-		character =
-			(hexLetter[byte & 0x0fu] << 8u) |
-			hexLetter[byte >> 4u];
+			case 2:
+				xos::writeHex(
+					va_arg(args, unsigned long long)
+				);
+				return 1;
 
-		// Move next byte to the top
-		value <<= 8u;
+			default:
+				__builtin_unreachable();
+			}
+		}
+
+		case 'd':
+			switch (count) {
+			case 0:
+				xos::writeDec(va_arg(args, int));
+				return 1;
+
+			case 1:
+				xos::writeDec(va_arg(args, long));
+				return 1;
+
+			case 2:
+				xos::writeDec(va_arg(args, long long));
+				return 1;
+
+			default:
+				__builtin_unreachable();
+			}
+
+		case 'u':
+			switch (count) {
+			case 0:
+				xos::writeDec(va_arg(args, unsigned int));
+				return 1;
+
+			case 1:
+				xos::writeDec(va_arg(args, unsigned long));
+				return 1;
+
+			case 2:
+				xos::writeDec(
+					va_arg(args, unsigned long long)
+				);
+				return 1;
+
+			default:
+				__builtin_unreachable();
+			}
+
+			break;
+
+		case 'b':
+			xos::write(va_arg(args, unsigned int) ?
+				   "true" :
+				   "false");
+			return 1;
+
+		case 'l':
+			break;
+
+		default:
+			return -1;
+		}
 	}
 
-	write(reinterpret_cast<char *>(buffer), BufferSize);
-}
-
-static inline void writeDec(int64_t value)
-{
-	if (value < 0) {
-		putchar('-');
-		value = -value;
-	}
-	else if (__builtin_expect(value == 23, 0)) {
-		// TODO: !IMPORTANT! Nezabudnut na macku
-		write("=(*.* = )~~");
-		return;
-	}
-
-	constexpr size_t
-	// Length of string holding maximum possible value of uint64_t
-		BufferSize = sizeof("18446744073709551615\0"),
-	// Index of last character
-		BufferLast = BufferSize - 1;
-
-
-	// Insertion goes in reverse so the divisions results are correctly
-	//  ordered (first remainder is the lowest decimal)
-	char
-		buffer[BufferSize],
-		*_Rstr buf = buffer + BufferLast;
-
-	*buf = '\0';
-
-	do {
-		uint32_t remainder;
-
-		value = div64u(value, 10, remainder);
-		*--buf = '0' + char(remainder);
-	} while (value);
-
-	write(buf);
-}
-
-static inline int format(char c, va_list &args)
-{
-	switch (c) {
-	case '%':
-		putchar('%');
-		return 0;
-
-	case 'c':
-		putchar(va_arg(args, int));
-		return 1;
-
-	case 's':
-		write(va_arg(args, const char *));
-		return 1;
-
-	case 'x':
-		writeHex(va_arg(args, unsigned int));
-		return 1;
-
-	case 'd':
-		writeDec(va_arg(args, unsigned int));
-		return 1;
-
-	case 'b':
-		write(va_arg(args, unsigned int) ? "true" : "false");
-		return 1;
-
-	default:
-		return -1;
-	}
+	return -1;
 }
 
 int printf(const char *_Rstr string, ...)
@@ -158,16 +145,19 @@ int printf(const char *_Rstr string, ...)
 
 	do {
 		if (c == '%') {
-			const char modifier = *++string;
-			const int result = format(modifier, args);
+			char buffer[FormatBufferLength] = "";
+
+			const int result = format(string, args, buffer);
 
 			if (__builtin_expect(result >= 0, 1)) {
 				count += result;
 				continue;
 			}
 
-			write("ERROR: printf: Unsupported format %");
-			putchar(modifier);
+			xos::write(
+				"ERROR: printf: Unsupported format %"
+			);
+			xos::write(buffer);
 			putchar('\n');
 
 			break;
@@ -182,23 +172,13 @@ int printf(const char *_Rstr string, ...)
 
 int putchar(int c)
 {
-#ifdef __xos_is_libk
-	tty::putchar(static_cast<char>(c));
-	return c;
-#else
-	// TODO: Implement system call
-	return EOF;
-#endif
+	xos::putchar(c);
+	return 0;
 }
 
 int puts(const char *string)
 {
-#ifdef __xos_is_libk
-	tty::write(string);
-	tty::putchar('\n');
+	xos::write(string);
+	xos::putchar('\n');
 	return 0;
-#else
-	// TODO: Implement system call
-	return EOF;
-#endif
 }
