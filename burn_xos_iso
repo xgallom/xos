@@ -1,4 +1,3 @@
 #!/bin/bash
 
 sudo dd if=cmake-build-$1-gcc-i686-elf/xos.iso of=$2 && sync
-
