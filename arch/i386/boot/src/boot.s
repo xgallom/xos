@@ -30,6 +30,13 @@
 
 # Reserve a stack for the initial thread.
 .section .bss
+
+.align 2
+.global xos_reg_dump
+xos_reg_dump:
+.skip 16
+xos_reg_dump_top:
+
 .align 16
 stack_bottom:
 .skip 16384 # 16 KiB
@@ -40,6 +47,20 @@ stack_top:
 .global _start
 .type _start, @function
 _start:
+    movl $xos_reg_dump_top, %esp
+    movw %gs, %ax
+    pushw %ax
+    movw %fs, %ax
+    pushw %ax
+    movw %ss, %ax
+    pushw %ax
+    movw %es, %ax
+    pushw %ax
+    movw %ds, %ax
+    pushw %ax
+    movw %cs, %ax
+    pushw %ax
+
 	movl $stack_top, %esp
 
 	# Call the global constructors.

@@ -67,13 +67,31 @@ static uint8_t getchar()
 
 _EXT_C
 
+extern uint16_t xos_reg_dump[6];
+
+extern void _start(void);
+
 void kernel_main(void)
 {
 	tty::initialize();
 	printWelcome();
 
+	const uint16_t *regDump = xos_reg_dump;
+
+	xos::printf("\n\ncs: 0x{x}\nds: 0x{x}\nes: 0x{x}\n"
+		    "ss: 0x{x}\nfs: 0x{x}\ngs: 0x{x}\n",
+		    regDump[0],
+		    regDump[1],
+		    regDump[2],
+		    regDump[3],
+		    regDump[4],
+		    regDump[5]
+	);
+
+	getchar();
+
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
-	xos::printf("\n\nTesting printf:\n");
+	xos::printf("\nTesting printf:\n");
 	tty::setColor(vga::ColorAttribute());
 
 	int processed = xos::printf(
@@ -105,8 +123,8 @@ void kernel_main(void)
 	xos::printf(
 		"\nInitializing Cpuid: {}",
 		hasCpuid ?
-		"Cpuid is available\nCpuid results:\n" :
-		"Cpuid is not available\n"
+		"available\nResults:\n" :
+		"not available\n"
 	);
 
 	if (hasCpuid) {
