@@ -2,7 +2,7 @@
 // Created by xgallom on 5/23/20.
 //
 
-#include <xos/write_decl.h>
+#include <xos/write.h>
 #include <xos/restrict.h>
 
 #ifdef __xos_is_libk
@@ -14,7 +14,7 @@
 
 namespace xos {
     template<typename T>
-    void writeHex(T value)
+    static inline void writeHexImpl(T value)
     {
 	    constexpr size_t BufferSize = sizeof(T);
 	    static constexpr char hexLetter[] = "0123456789abcdef";
@@ -35,19 +35,28 @@ namespace xos {
 	    xos::write(reinterpret_cast<char *>(buffer), BufferSize * 2);
     }
 
-    template void writeHex(char);
-    template void writeHex(unsigned char);
-    template void writeHex(short);
-    template void writeHex(unsigned short);
-    template void writeHex(int);
-    template void writeHex(unsigned int);
-    template void writeHex(long);
-    template void writeHex(unsigned long);
-    template void writeHex(long long);
-    template void writeHex(unsigned long long);
+    void writeHex(char value) { return writeHexImpl(value); }
+
+    void writeHex(unsigned char value) { return writeHexImpl(value); }
+
+    void writeHex(short value) { return writeHexImpl(value); }
+
+    void writeHex(unsigned short value) { return writeHexImpl(value); }
+
+    void writeHex(int value) { return writeHexImpl(value); }
+
+    void writeHex(unsigned int value) { return writeHexImpl(value); }
+
+    void writeHex(long value) { return writeHexImpl(value); }
+
+    void writeHex(unsigned long value) { return writeHexImpl(value); }
+
+    void writeHex(long long value) { return writeHexImpl(value); }
+
+    void writeHex(unsigned long long value) { return writeHexImpl(value); }
 
     template<typename T>
-    inline void writeDec(T value)
+    static inline void writeDecImpl(T value)
     {
 	    if (value < T(0)) {
 		    xos::putchar('-');
@@ -83,7 +92,7 @@ namespace xos {
     }
 
     template<>
-    void writeDec(long long value)
+    inline void writeDecImpl(long long value)
     {
 	    if (value < 0) {
 		    xos::putchar('-');
@@ -120,7 +129,7 @@ namespace xos {
     }
 
     template<>
-    void writeDec(unsigned long long value)
+    inline void writeDecImpl(unsigned long long value)
     {
 	    if (__builtin_expect(value == 23, 0)) {
 		    // TODO: !IMPORTANT! Nezabudnut na macku
@@ -152,17 +161,67 @@ namespace xos {
 	    write(buf);
     }
 
-    template void writeDec(char);
-    template void writeDec(unsigned char);
-    template void writeDec(short);
-    template void writeDec(unsigned short);
-    template void writeDec(int);
-    template void writeDec(unsigned int);
-    template void writeDec(long);
-    template void writeDec(unsigned long);
+    void writeDec(char value) { return writeDecImpl(value); }
+
+    void writeDec(unsigned char value) { return writeDecImpl(value); }
+
+    void writeDec(short value) { return writeDecImpl(value); }
+
+    void writeDec(unsigned short value) { return writeDecImpl(value); }
+
+    void writeDec(int value) { return writeDecImpl(value); }
+
+    void writeDec(unsigned int value) { return writeDecImpl(value); }
+
+    void writeDec(long value) { return writeDecImpl(value); }
+
+    void writeDec(unsigned long value) { return writeDecImpl(value); }
+
+    void writeDec(long long value) { return writeDecImpl(value); }
+
+    void writeDec(unsigned long long value) { return writeDecImpl(value); }
 
     template<typename T>
-    bool write(
+    static inline void writeBinImpl(T value)
+    {
+	    constexpr size_t BufferSize = sizeof(T) * 8;
+
+	    char
+		    buffer[BufferSize],
+		    *rbuffer = buffer + BufferSize - 1;
+
+	    do {
+		    // Fucking little-endian
+		    *rbuffer-- = '0' + (value & 0x01u);;
+
+		    value >>= 1u;
+	    } while (rbuffer >= buffer);
+
+	    xos::write(buffer, BufferSize);
+    }
+
+    void writeBin(char value) { return writeBinImpl(value); }
+
+    void writeBin(unsigned char value) { return writeBinImpl(value); }
+
+    void writeBin(short value) { return writeBinImpl(value); }
+
+    void writeBin(unsigned short value) { return writeBinImpl(value); }
+
+    void writeBin(int value) { return writeBinImpl(value); }
+
+    void writeBin(unsigned int value) { return writeBinImpl(value); }
+
+    void writeBin(long value) { return writeBinImpl(value); }
+
+    void writeBin(unsigned long value) { return writeBinImpl(value); }
+
+    void writeBin(long long value) { return writeBinImpl(value); }
+
+    void writeBin(unsigned long long value) { return writeBinImpl(value); }
+
+    template<typename T>
+    static inline bool writeImpl(
 	    const char *formatBuffer,
 	    T arg,
 	    const char *&errorBuffer,
@@ -171,6 +230,10 @@ namespace xos {
 	    if (formatLength) {
 		    if (*formatBuffer == 'x') {
 			    writeHex(arg);
+			    return true;
+		    }
+		    else if (*formatBuffer == 'b') {
+			    writeBin(arg);
 			    return true;
 		    }
 		    else if (*formatBuffer != 'd') {
@@ -184,7 +247,87 @@ namespace xos {
 	    return true;
     }
 
-    template<>
+    bool write(
+	    const char *formatBuffer,
+	    char arg,
+	    const char *&errorBuffer,
+	    size_t formatLength)
+    {
+	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
+    }
+    bool write(
+	    const char *formatBuffer,
+	    unsigned char arg,
+	    const char *&errorBuffer,
+	    size_t formatLength)
+    {
+	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
+    }
+    bool write(
+	    const char *formatBuffer,
+	    short arg,
+	    const char *&errorBuffer,
+	    size_t formatLength)
+    {
+	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
+    }
+    bool write(
+	    const char *formatBuffer,
+	    unsigned short arg,
+	    const char *&errorBuffer,
+	    size_t formatLength)
+    {
+	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
+    }
+    bool write(
+	    const char *formatBuffer,
+	    int arg,
+	    const char *&errorBuffer,
+	    size_t formatLength)
+    {
+	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
+    }
+    bool write(
+	    const char *formatBuffer,
+	    unsigned int arg,
+	    const char *&errorBuffer,
+	    size_t formatLength)
+    {
+	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
+    }
+    bool write(
+	    const char *formatBuffer,
+	    long arg,
+	    const char *&errorBuffer,
+	    size_t formatLength)
+    {
+	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
+    }
+    bool write(
+	    const char *formatBuffer,
+	    unsigned long arg,
+	    const char *&errorBuffer,
+	    size_t formatLength)
+    {
+	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
+    }
+    bool write(
+	    const char *formatBuffer,
+	    long long arg,
+	    const char *&errorBuffer,
+	    size_t formatLength)
+    {
+	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
+    }
+    bool write(
+	    const char *formatBuffer,
+	    unsigned long long arg,
+	    const char *&errorBuffer,
+	    size_t formatLength)
+    {
+	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
+    }
+
     bool write(
 	    const char *,
 	    bool arg,
@@ -200,7 +343,6 @@ namespace xos {
 	    return true;
     }
 
-    template<>
     bool write(
 	    const char *,
 	    const char *arg,
@@ -216,27 +358,6 @@ namespace xos {
 
 	    return true;
     }
-
-    template bool write(
-	    const char *, char, const char *&, size_t);
-    template bool write(
-	    const char *, unsigned char, const char *&, size_t);
-    template bool write(
-	    const char *, short, const char *&, size_t);
-    template bool write(
-	    const char *, unsigned short, const char *&, size_t);
-    template bool write(
-	    const char *, int, const char *&, size_t);
-    template bool write(
-	    const char *, unsigned int, const char *&, size_t);
-    template bool write(
-	    const char *, long, const char *&, size_t);
-    template bool write(
-	    const char *, unsigned long, const char *&, size_t);
-    template bool write(
-	    const char *, long long, const char *&, size_t);
-    template bool write(
-	    const char *, unsigned long long, const char *&, size_t);
 
     void write(const char *string)
     {

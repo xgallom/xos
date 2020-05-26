@@ -14,7 +14,13 @@ namespace xos {
     {
 	    const char *errorBuffer = "";
 
-	    if (!(format(string, args, errorBuffer) && ...)) {
+	    if (!(
+		    format<Args>(
+			    string,
+			    args,
+			    errorBuffer
+		    ) && ...
+	    )) {
 		    write(errorBuffer);
 		    return -1;
 	    }

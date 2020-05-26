@@ -7,6 +7,7 @@
 
 #include "write.h"
 #include <stddef.h>
+#include <xos/utility.h>
 
 namespace xos {
     namespace _format {
@@ -19,13 +20,15 @@ namespace xos {
     template<typename T>
     bool format(
 	    const char *&string,
-	    const T &arg,
+	    T arg,
 	    const char *&errorBuffer)
     {
 	    char
 		    formatBuffer[_format::MaxBufferLength + 1] = "",
 		    *formatPtr = formatBuffer,
 		    c;
+
+	    restart:
 
 	    while ((c = *string++)) {
 		    if (c == '{') {
@@ -39,6 +42,17 @@ namespace xos {
 						    errorBuffer,
 						    formatLength
 					    );
+				    else if (c == '{') {
+					    if (formatLength) {
+						    errorBuffer =
+							    "Duplicate { with "
+							    "content between";
+						    return false;
+					    }
+
+					    putchar('{');
+					    goto restart;
+				    }
 
 				    *formatPtr++ = c;
 			    } while (

@@ -21,7 +21,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <stddef.h>
-#include <xos/write_decl.h>
+#include <xos/write.h>
 
 static constexpr size_t FormatBufferLength = 3;
 
