@@ -14,20 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-add_subdirectory(asm)
-add_subdirectory(cpuid)
-add_subdirectory(gdt)
-add_subdirectory(multiboot)
-add_subdirectory(tty)
-add_subdirectory(vga)
+file(GLOB_RECURSE files "src/*.cpp")
 
-add_library(arch_kernel INTERFACE)
+add_library(arch_kernel_mbt STATIC ${files})
+target_include_directories(arch_kernel_mbt PUBLIC include)
 
-target_link_libraries(arch_kernel INTERFACE
-        arch_kernel_asm
-        arch_kernel_cpuid
-        arch_kernel_gdt
-        arch_kernel_mbt
-        arch_kernel_tty
-        arch_kernel_vga
-        )
+target_link_libraries(arch_kernel_mbt PRIVATE libk)
