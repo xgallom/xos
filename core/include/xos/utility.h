@@ -50,10 +50,11 @@ namespace xos {
     struct is_reference<T &> : true_type {};
 
     template<typename T>
-    T forward(T arg) {
-    	if constexpr(is_reference<T>::value)
-		return static_cast<const T &>(arg);
-    	return arg;
+    T forward(T arg)
+    {
+	    if constexpr(is_reference<T>::value)
+		    return static_cast<const T &>(arg);
+	    return arg;
     }
 }
 

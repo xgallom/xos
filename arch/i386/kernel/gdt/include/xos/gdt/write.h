@@ -25,10 +25,10 @@
 
 namespace xos {
     inline bool write(const char *,
-	       gdt::GdtEntry arg,
-	       const char *&errorBuffer,
-	       size_t formatLength,
-	       size_t offsetIndex = 0)
+		      gdt::GdtEntry arg,
+		      const char *&errorBuffer,
+		      size_t formatLength,
+		      size_t offsetIndex = 0)
     {
 	    if (formatLength) {
 		    errorBuffer = "gdt::GdtEntry expects no format";

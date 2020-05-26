@@ -255,6 +255,7 @@ namespace xos {
     {
 	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
     }
+
     bool write(
 	    const char *formatBuffer,
 	    unsigned char arg,
@@ -263,6 +264,7 @@ namespace xos {
     {
 	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
     }
+
     bool write(
 	    const char *formatBuffer,
 	    short arg,
@@ -271,6 +273,7 @@ namespace xos {
     {
 	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
     }
+
     bool write(
 	    const char *formatBuffer,
 	    unsigned short arg,
@@ -279,6 +282,7 @@ namespace xos {
     {
 	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
     }
+
     bool write(
 	    const char *formatBuffer,
 	    int arg,
@@ -287,6 +291,7 @@ namespace xos {
     {
 	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
     }
+
     bool write(
 	    const char *formatBuffer,
 	    unsigned int arg,
@@ -295,6 +300,7 @@ namespace xos {
     {
 	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
     }
+
     bool write(
 	    const char *formatBuffer,
 	    long arg,
@@ -303,6 +309,7 @@ namespace xos {
     {
 	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
     }
+
     bool write(
 	    const char *formatBuffer,
 	    unsigned long arg,
@@ -311,6 +318,7 @@ namespace xos {
     {
 	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
     }
+
     bool write(
 	    const char *formatBuffer,
 	    long long arg,
@@ -319,6 +327,7 @@ namespace xos {
     {
 	    return writeImpl(formatBuffer, arg, errorBuffer, formatLength);
     }
+
     bool write(
 	    const char *formatBuffer,
 	    unsigned long long arg,
