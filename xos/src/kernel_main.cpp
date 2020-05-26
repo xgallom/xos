@@ -22,6 +22,8 @@
 #include <xos/ext_c.h>
 #include <xos/tty.h>
 #include <xos/vga.h>
+#include <xos/gdt/write.h>
+#include <xos/mbt/write.h>
 #include <xos/stdio.h>
 #include <xos/port.h>
 #include <xos/pause.h>
@@ -37,7 +39,7 @@ static void printWelcome()
 	tty::write(" greets your bitch ass.\n\n");
 
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightBlue));
-	tty::write("Copyright Milan Gallo 2020.");
+	tty::write("Copyright Milan Gallo 2020.\n");
 }
 
 // TODO: Move to arch/kernel/ps2
@@ -71,14 +73,27 @@ extern uint16_t xos_reg_dump[6];
 
 extern void _start(void);
 
-void kernel_main(void)
+void kernel_main(uint32_t magic, uint32_t *multiboot)
 {
+
 	tty::initialize();
 	printWelcome();
 
+	if (!mbt::initialize(magic, multiboot)) {
+		xos::printf("Invalid multiboot: 0x{x} 0x{x}\n",
+			    magic,
+			    uintptr_t(multiboot)
+		);
+		return;
+	}
+
+	xos::printf("\nMultiboot: ");
+	tty::setColor(vga::ColorAttribute());
+	xos::printf("{}\n", &mbt::entry());
+
 	const uint16_t *regDump = xos_reg_dump;
 
-	xos::printf("\n\ncs: 0x{x}\nds: 0x{x}\nes: 0x{x}\n"
+	xos::printf("\ncs: 0x{x}\nds: 0x{x}\nes: 0x{x}\n"
 		    "ss: 0x{x}\nfs: 0x{x}\ngs: 0x{x}\n",
 		    regDump[0],
 		    regDump[1],
@@ -87,6 +102,27 @@ void kernel_main(void)
 		    regDump[4],
 		    regDump[5]
 	);
+
+	getchar();
+
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
+	xos::printf("\nGrub-created gdtr:\n");
+
+	gdt::storeGdtr();
+	const auto &gdtr = gdt::gdtr();
+
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightBlue));
+	xos::printf("Size:\t\t {x}\nAddress:\t {x}\n",
+		    gdtr.size,
+		    uintptr_t(gdtr.address)
+	);
+
+	for (size_t n = 0; n < (gdtr.size + 1u) / 8u; ++n) {
+		tty::setColor(vga::ColorAttribute(vga::Color::BrightBlue));
+		xos::printf("{}: ", n);
+		tty::setColor(vga::ColorAttribute());
+		xos::printf("{}\n", gdtr.address[n]);
+	}
 
 	getchar();
 

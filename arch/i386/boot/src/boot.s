@@ -68,6 +68,8 @@ _start:
 	# call _init
 
 	# Transfer control to the main kernel.
+	push %ebx
+	push %eax
 	call kernel_main
 
 	# Hang if kernel_main unexpectedly returns.
