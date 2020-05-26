@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cloc arch CMakeLists.txt core image_root libc xos
+
