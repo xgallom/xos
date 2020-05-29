@@ -120,7 +120,7 @@ namespace xos {
 	    *buf = '\0';
 
 	    do {
-		    uint32_t remainder = value % 10;
+		    uint32_t remainder;
 		    value = div64u(value, 10, remainder);
 		    *--buf = '0' + char(remainder);
 	    } while (value);
@@ -153,7 +153,7 @@ namespace xos {
 	    *buf = '\0';
 
 	    do {
-		    uint32_t remainder = value % 10;
+		    uint32_t remainder;
 		    value = div64u(value, 10, remainder);
 		    *--buf = '0' + char(remainder);
 	    } while (value);

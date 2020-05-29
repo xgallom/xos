@@ -16,18 +16,24 @@
 
 cmake_minimum_required(VERSION 3.12)
 
+
+# Cross Compiler Setup
+
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)
 
-# specify cross compilers and tools
-SET(CMAKE_C_COMPILER_WORKS 1)
-SET(CMAKE_CXX_COMPILER_WORKS 1)
+set(CMAKE_C_COMPILER_WORKS 1)
+set(CMAKE_CXX_COMPILER_WORKS 1)
 
+
+# Project Setup
 
 project(xos C CXX ASM)
 set(CMAKE_C_STANDARD gnu99)
 set(CMAKE_CXX_STANDARD 17)
 
+
+# Xos Arch Setup
 
 set(XOS_ARCHITECTURES i386)
 
@@ -40,13 +46,37 @@ else ()
 endif ()
 
 
+# Compilation Flags
+
 set(COMMON_FLAGS "-fno-asynchronous-unwind-tables -fno-dwarf2-cfi-asm  \
 -ffreestanding -Wall -Wextra -Werror")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${COMMON_FLAGS} -nostdlib")
+set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} ${COMMON_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${COMMON_FLAGS} \
+ -fno-exceptions -fno-rtti -nostdlib")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} -fno-exceptions \
--fno-rtti -Wmultiple-inheritance -Wuseless-cast -Wimplicit-fallthrough=5")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} \
+-fno-exceptions -fno-rtti \
+-Wmultiple-inheritance -Wuseless-cast -Wimplicit-fallthrough=5")
 
+
+# Link Time Optimization
+
+set(CMAKE_AR "/usr/local/gcc/i686-elf/bin/i686-elf-gcc-ar")
+set(CMAKE_ASM_ARCHIVE_CREATE "<CMAKE_AR> qcs <TARGET> <LINK_FLAGS> <OBJECTS>")
+set(CMAKE_ASM_ARCHIVE_FINISH true)
+set(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> qcs <TARGET> <LINK_FLAGS> <OBJECTS>")
+set(CMAKE_C_ARCHIVE_FINISH true)
+set(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> qcs <TARGET> <LINK_FLAGS> <OBJECTS>")
+set(CMAKE_CXX_ARCHIVE_FINISH true)
+
+set(LTO_FLAGS "-flto -fuse-linker-plugin")
+set(CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE} ${LTO_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${LTO_FLAGS}")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${LTO_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${LTO_FLAGS}")
+
+
+# Addition of Sources
 
 add_subdirectory(core)
 add_subdirectory(arch)
@@ -54,5 +84,7 @@ add_subdirectory(libc)
 add_subdirectory(xos)
 add_subdirectory(image_root)
 
+
+# Linker Script
 
 target_link_options(xos PUBLIC "-T${CMAKE_SOURCE_DIR}/arch/${XOS_ARCH}/linker.ld")
