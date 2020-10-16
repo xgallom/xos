@@ -14,18 +14,19 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 //
-// Created by xgallom on 5/25/20.
+// Created by xgallom on 10/15/20.
 //
 
-#ifndef _XOS_ARCH_I386_KERNEL_GDT_INCLUDE_XOS_GDT_WRITE_H
-#define _XOS_ARCH_I386_KERNEL_GDT_INCLUDE_XOS_GDT_WRITE_H
+#ifndef _ARCH_I386_KERNEL_DESCRIPTORS_INCLUDE_XOS_DESCRIPTORS_WRITE_H
+#define _ARCH_I386_KERNEL_DESCRIPTORS_INCLUDE_XOS_DESCRIPTORS_WRITE_H
 
-#include "../gdt.h"
-#include <xos/write.h>
+#include "gdt/write.h"
+#include "idt/write.h"
 
 namespace xos {
+    template<typename DescriptorType>
     inline bool write(const char *,
-		      gdt::GdtEntry arg,
+		      DescriptorRegister<DescriptorType> arg,
 		      const char *&errorBuffer,
 		      size_t formatLength,
 		      size_t offsetIndex = 0)
@@ -38,33 +39,16 @@ namespace xos {
 	    const auto offset = TabOffset(offsetIndex);
 	    const auto newOffset = TabOffset(offsetIndex + 1);
 
-	    const uint32_t
-		    base = (uint32_t(arg.base2) << 24u) |
-			   (uint32_t(arg.base1) << 16u) |
-			   arg.base0,
-		    limit = (uint32_t(arg.limit1) << 16u) |
-			    arg.limit0;
-
-	    xos::write("gdt::GdtEntry {{\n");
+	    xos::write("DescriptorRegister {\n");
 
 	    xos::write(newOffset);
-	    xos::write("base:\t");
-	    xos::writeHex(base);
+	    xos::write("size:\t");
+	    xos::writeHex(arg.size);
 	    xos::write("\n");
 
 	    xos::write(newOffset);
-	    xos::write("limit:\t");
-	    xos::writeHex(limit);
-	    xos::write("\n");
-
-	    xos::write(newOffset);
-	    xos::write("access:\t");
-	    xos::writeBin(arg.access);
-	    xos::write("\n");
-
-	    xos::write(newOffset);
-	    xos::write("flags:\t");
-	    xos::writeBin(arg.flags);
+	    xos::write("address:\t");
+	    xos::writeHex(uintptr_t(arg.address));
 	    xos::write("\n");
 
 	    xos::write(offset);
@@ -74,4 +58,4 @@ namespace xos {
     }
 }
 
-#endif //_XOS_ARCH_I386_KERNEL_GDT_INCLUDE_XOS_GDT_WRITE_H
+#endif //_ARCH_I386_KERNEL_DESCRIPTORS_INCLUDE_XOS_DESCRIPTORS_WRITE_H

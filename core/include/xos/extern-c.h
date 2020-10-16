@@ -14,38 +14,24 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 //
-// Created by xgallom on 5/25/20.
+// Created by xgallom on 5/11/20.
 //
 
-#ifndef _XOS_ARCH_I386_KERNEL_GDT_INCLUDE_XOS_GDT_H
-#define _XOS_ARCH_I386_KERNEL_GDT_INCLUDE_XOS_GDT_H
+#ifndef _XOS_CORE_INCLUDE_XOS_EXT_C_H
+#define _XOS_CORE_INCLUDE_XOS_EXT_C_H
 
-#include <stdint.h>
-#include <xos/packed.h>
+#include <sys/cdefs.h>
 
-namespace gdt {
-    struct _Pckd GdtEntry {
-	    union {
-		    uint64_t entry;
-		    struct _Pckd {
-			    uint16_t limit0;
-			    uint16_t base0;
-			    uint8_t base1;
-			    uint8_t access;
-			    uint8_t limit1 : 4,
-				    flags : 4;
-			    uint8_t base2;
-		    };
-	    };
-    };
+#ifdef __cplusplus
 
-    struct _Pckd Gdtr {
-	    uint16_t size;
-	    GdtEntry *address;
-    };
+#define _EXT_C     extern "C" {
+#define _EXT_C_END }
 
-    void storeGdtr();
-    const Gdtr &gdtr();
-}
+#else
 
-#endif //_XOS_ARCH_I386_KERNEL_GDT_INCLUDE_XOS_GDT_H
+#define _EXT_C
+#define _EXT_C_END
+
+#endif
+
+#endif //_XOS_CORE_INCLUDE_XOS_EXT_C_H

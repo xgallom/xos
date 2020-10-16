@@ -16,7 +16,7 @@
 
 add_subdirectory(asm)
 add_subdirectory(cpuid)
-add_subdirectory(gdt)
+add_subdirectory(descriptors)
 add_subdirectory(multiboot)
 add_subdirectory(tty)
 add_subdirectory(vga)
@@ -26,7 +26,7 @@ add_library(arch_kernel INTERFACE)
 target_link_libraries(arch_kernel INTERFACE
         arch_kernel_asm
         arch_kernel_cpuid
-        arch_kernel_gdt
+        arch_kernel_descriptors
         arch_kernel_mbt
         arch_kernel_tty
         arch_kernel_vga

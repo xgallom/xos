@@ -14,24 +14,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 //
-// Created by xgallom on 5/11/20.
+// Created by xgallom on 10/16/20.
 //
 
-#ifndef _XOS_CORE_INCLUDE_XOS_EXT_C_H
-#define _XOS_CORE_INCLUDE_XOS_EXT_C_H
+#ifndef _CORE_INCLUDE_XOS_INTERRUPT_H
+#define _CORE_INCLUDE_XOS_INTERRUPT_H
 
-#include <sys/cdefs.h>
+#define _Intr __attribute__((__interrupt__))
 
-#ifdef __cplusplus
-
-#define _EXT_C extern "C" {
-#define _EXT_C_END }
-
-#else
-
-#define _EXT_C
-#define _EXT_C_END
-
-#endif
-
-#endif //_XOS_CORE_INCLUDE_XOS_EXT_C_H
+#endif //_CORE_INCLUDE_XOS_INTERRUPT_H

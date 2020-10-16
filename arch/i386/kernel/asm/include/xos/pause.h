@@ -20,6 +20,8 @@
 #ifndef _XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PAUSE_H
 #define _XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PAUSE_H
 
-inline void pause() { asm volatile("pause"); }
+#include <xos/always-inline.h>
+
+static _Inln void pause() { asm volatile("pause"); }
 
 #endif //_XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PAUSE_H

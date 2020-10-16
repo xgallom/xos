@@ -20,7 +20,11 @@
 #ifndef _XOS_LIBC_INCLUDE_XOS_STRING_H
 #define _XOS_LIBC_INCLUDE_XOS_STRING_H
 
-#include "../string.h"
+#include <sys/cdefs.h>
+#include <xos/extern-c.h>
+#include <xos/restrict.h>
+
+#include <stddef.h>
 
 namespace xos {
     template<typename T>
@@ -61,7 +65,7 @@ namespace xos {
     }
 
     template<typename T>
-    T *memset(T *_Rstr dest, T value, size_t count)
+    inline T *memset(T *_Rstr dest, T value, size_t count)
     {
 	    if (!count)
 		    return dest;
@@ -76,7 +80,7 @@ namespace xos {
     }
 
     template<typename T, size_t N>
-    T *memset(T (&_Rstr dest)[N], T value)
+    inline T *memset(T (&_Rstr dest)[N], T value)
     {
 	    for (auto &entry : dest)
 		    entry = value;

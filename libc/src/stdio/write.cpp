@@ -100,9 +100,9 @@ namespace xos {
 
 	    constexpr size_t
 	    // Length of string holding maximum possible value of uint32_t
-		    BufferSize = sizeof("4294967295\0"),
+	    BufferSize = sizeof("4294967295\0"),
 	    // Index of last character
-		    BufferLast = BufferSize - 1;
+	    BufferLast = BufferSize - 1;
 
 
 	    // Insertion goes in reverse so the divisions results are correctly
@@ -136,9 +136,9 @@ namespace xos {
 
 	    constexpr size_t
 	    // Length of string holding maximum possible value of uint64_t
-		    BufferSize = sizeof("18446744073709551615\0"),
+	    BufferSize = sizeof("18446744073709551615\0"),
 	    // Index of last character
-		    BufferLast = BufferSize - 1;
+	    BufferLast = BufferSize - 1;
 
 
 	    // Insertion goes in reverse so the divisions results are correctly
@@ -169,9 +169,9 @@ namespace xos {
 
 	    constexpr size_t
 	    // Length of string holding maximum possible value of uint64_t
-		    BufferSize = sizeof("18446744073709551615\0"),
+	    BufferSize = sizeof("18446744073709551615\0"),
 	    // Index of last character
-		    BufferLast = BufferSize - 1;
+	    BufferLast = BufferSize - 1;
 
 
 	    // Insertion goes in reverse so the divisions results are correctly

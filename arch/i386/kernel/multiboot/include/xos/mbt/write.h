@@ -24,130 +24,89 @@
 #include <xos/write.h>
 
 namespace xos {
-    inline bool write(const char *,
-		      mbt::Multiboot::Header arg,
-		      const char *&errorBuffer,
-		      size_t formatLength,
-		      size_t offsetIndex = 0)
-    {
-	    if (formatLength) {
-		    errorBuffer = "mbt::Multiboot::Header expects no format";
-		    return false;
-	    }
-
-	    const auto offset = TabOffset(offsetIndex);
-	    const auto newOffset = TabOffset(offsetIndex + 1);
-
-	    xos::write("xos::Multiboot::Header{\n");
-
-	    xos::write(newOffset);
-	    xos::write("flags:\t");
-	    xos::writeBin(arg.flags);
-	    xos::write("\n");
-
-	    xos::write(offset);
-	    xos::write("}");
-
-	    return true;
-    }
-
-    inline bool write(const char *,
-		      mbt::Multiboot::Memory arg,
-		      const char *&errorBuffer,
-		      size_t formatLength,
-		      size_t offsetIndex = 0)
-    {
-	    if (formatLength) {
-		    errorBuffer = "mbt::Multiboot::Memory expects no format";
-		    return false;
-	    }
-
-	    const auto offset = TabOffset(offsetIndex);
-	    const auto newOffset = TabOffset(offsetIndex + 1);
-
-	    xos::write("mbt::Multiboot::Memory{\n");
-
-	    xos::write(newOffset);
-	    xos::write("lower:\t");
-	    xos::writeHex(arg.lower);
-	    xos::write("\n");
-
-	    xos::write(newOffset);
-	    xos::write("upper:\t");
-	    xos::writeHex(arg.upper);
-	    xos::write("\n");
-
-	    xos::write(offset);
-	    xos::write("}");
-
-	    return true;
-    }
-
-    inline bool write(const char *,
-		      const mbt::Multiboot::Boot arg,
-		      const char *&errorBuffer,
-		      size_t formatLength,
-		      size_t offsetIndex = 0)
-    {
-	    if (formatLength) {
-		    errorBuffer = "mbt::Multiboot::Boot expects no format";
-		    return false;
-	    }
-
-	    const auto offset = TabOffset(offsetIndex);
-	    const auto newOffset = TabOffset(offsetIndex + 1);
-
-	    xos::write("mbt::Multiboot::Boot{\n");
-
-	    xos::write(newOffset);
-	    xos::write("device:\t");
-	    xos::writeHex(arg.device);
-	    xos::write("\n");
-
-	    xos::write(offset);
-	    xos::write("}");
-
-	    return true;
-    }
-
-    inline bool write(const char *,
-		      const mbt::Multiboot::Object *arg,
-		      const char *&errorBuffer,
-		      size_t formatLength,
-		      size_t offsetIndex = 0)
-    {
-	    if (formatLength) {
-		    errorBuffer = "mbt::Multiboot::Object expects no format";
-		    return false;
-	    }
+    bool write(const char *,
+	       mbt::Multiboot::Header arg,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
 
 
-	    const auto offset = TabOffset(offsetIndex);
-	    const auto newOffsetIndex = offsetIndex + 1;
-	    const auto newOffset = TabOffset(newOffsetIndex);
+    bool write(const char *,
+	       mbt::Multiboot::Memory arg,
+	       const char *&errorBuffer,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
 
-	    xos::write("mbt::Multiboot::Object{\n");
+    bool write(const char *,
+	       mbt::Multiboot::Boot arg,
+	       const char *&errorBuffer,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
 
-	    xos::write(newOffset);
-	    xos::write("header:\t");
-	    xos::write("", arg->header, errorBuffer, 0, newOffsetIndex);
-	    xos::write("\n");
+    bool write(const char *,
+	       mbt::Multiboot::Command arg,
+	       const char *&errorBuffer,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
 
-	    xos::write(newOffset);
-	    xos::write("memory:\t");
-	    xos::write("", arg->memory, errorBuffer, 0, newOffsetIndex);
-	    xos::write("\n");
+    bool write(const char *,
+	       mbt::Multiboot::Modules arg,
+	       const char *&errorBuffer,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
 
-	    xos::write(newOffset);
-	    xos::write("boot:\t");
-	    xos::write("", arg->boot, errorBuffer, 0, newOffsetIndex);
-	    xos::write("\n");
+    bool write(const char *,
+	       mbt::Multiboot::Symbols arg,
+	       const char *&errorBuffer,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
 
-	    xos::write(offset);
-	    xos::write("}");
+    bool write(const char *,
+	       mbt::Multiboot::MemoryMap arg,
+	       const char *&errorBuffer,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
 
-	    return true;
-    }
+    bool write(const char *,
+	       mbt::Multiboot::Drives arg,
+	       const char *&errorBuffer,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
+
+    bool write(const char *,
+	       mbt::Multiboot::Config arg,
+	       const char *&errorBuffer,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
+
+    bool write(const char *,
+	       mbt::Multiboot::BootLoader arg,
+	       const char *&errorBuffer,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
+
+    bool write(const char *,
+	       mbt::Multiboot::ApmTable arg,
+	       const char *&errorBuffer,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
+
+    bool write(const char *,
+	       mbt::Multiboot::Vbe arg,
+	       const char *&errorBuffer,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
+
+    bool write(const char *,
+	       mbt::Multiboot::FrameBuffer arg,
+	       const char *&errorBuffer,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
+
+    bool write(const char *,
+	       const mbt::Multiboot::Object *arg,
+	       const char *&errorBuffer,
+	       size_t formatLength,
+	       size_t offsetIndex = 0);
 }
 
 #endif //_XOS_ARCH_I386_KERNEL_MULTIBOOT_INCLUDE_XOS_WRITE_MBT_H

@@ -19,15 +19,23 @@
 
 #include "compiler_checks.h"
 
-#include <xos/ext_c.h>
+#include <xos/extern-c.h>
 #include <xos/tty.h>
 #include <xos/vga.h>
-#include <xos/gdt/write.h>
+#include <xos/descriptors/write.h>
 #include <xos/mbt/write.h>
 #include <xos/stdio.h>
 #include <xos/port.h>
 #include <xos/pause.h>
 #include <xos/cpuid.h>
+#include <stdio.h>
+
+_EXT_C
+
+extern uint16_t xos_reg_dump[6];
+void kernel_main(uint32_t magic, uint32_t *multiboot);
+
+_EXT_C_END
 
 static void printWelcome()
 {
@@ -67,16 +75,15 @@ static uint8_t getchar()
 	}
 }
 
-_EXT_C
-
-extern uint16_t xos_reg_dump[6];
-
-extern void _start(void);
+static void getReturn()
+{
+	//while (getchar() != 28) {}
+}
 
 void kernel_main(uint32_t magic, uint32_t *multiboot)
 {
-
 	tty::initialize();
+
 	printWelcome();
 
 	if (!mbt::initialize(magic, multiboot)) {
@@ -91,6 +98,8 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 	tty::setColor(vga::ColorAttribute());
 	xos::printf("{}\n", &mbt::entry());
 
+	getReturn();
+
 	const uint16_t *regDump = xos_reg_dump;
 
 	xos::printf("\ncs: 0x{x}\nds: 0x{x}\nes: 0x{x}\n"
@@ -103,7 +112,7 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 		    regDump[5]
 	);
 
-	getchar();
+	getReturn();
 
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
 	xos::printf("\nGrub-created gdtr:\n");
@@ -122,9 +131,51 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 		xos::printf("{}: ", n);
 		tty::setColor(vga::ColorAttribute());
 		xos::printf("{}\n", gdtr.address[n]);
+		getReturn();
 	}
 
-	getchar();
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
+	xos::printf("\nOur gdtr:\n");
+
+	gdt::loadGdtr();
+
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightBlue));
+	xos::printf("Size:\t\t {x}\nAddress:\t {x}\n",
+		    gdtr.size,
+		    uintptr_t(gdtr.address)
+	);
+
+	for (size_t n = 0; n < (gdtr.size + 1u) / 8u; ++n) {
+		tty::setColor(vga::ColorAttribute(vga::Color::BrightBlue));
+		xos::printf("{}: ", n);
+		tty::setColor(vga::ColorAttribute());
+		xos::printf("{}\n", gdtr.address[n]);
+		getReturn();
+	}
+
+
+	const auto &idtr = idt::idtr();
+
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
+	xos::printf("\nOur idtr:\n");
+
+	idt::loadIdtr();
+	for (;;) { pause(); }
+
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightBlue));
+	xos::printf("Size:\t\t {x}\nAddress:\t {x}\n",
+		    idtr.size,
+		    uintptr_t(idtr.address)
+	);
+
+	for (size_t n = 0; n < (idtr.size + 1u) / 8u; ++n) {
+		tty::setColor(vga::ColorAttribute(vga::Color::BrightBlue));
+		xos::printf("{}: ", n);
+		tty::setColor(vga::ColorAttribute());
+		xos::printf("{}\n", idtr.address[n]);
+		getReturn();
+	}
+
 
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
 	xos::printf("\nTesting printf:\n");
@@ -136,7 +187,7 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 		"\t Char\t\t \'{}\'\n"
 		"\t Int\t\t {}\n"
 		"\t 23\t\t {}\n"
-		"\t Invalid\t {}\n",
+		"\t Invalid\t {a}",
 		0xdeadb33f,
 		"This is echoed as well.",
 		'#',
@@ -147,11 +198,11 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
 	xos::printf(
-		"printf: {} entries processed (should be 5)\n",
+		"\nprintf: {} entries processed (should be -1)\n",
 		processed
 	);
 
-	getchar();
+	getReturn();
 
 
 	bool hasCpuid = cpuid::initialize();
@@ -198,7 +249,7 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 			xos::printf("\"\n");
 		}
 
-		getchar();
+		getReturn();
 
 
 		tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
@@ -207,7 +258,7 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 		     feature < 32;
 		     ++feature) {
 			if (!(feature & 0x07u))
-				getchar();
+				getReturn();
 
 			const auto featureType =
 				static_cast<cpuid::FeatureType::Enum>(
@@ -232,7 +283,7 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 		     feature < 32;
 		     ++feature) {
 			if (!(feature & 0x07u))
-				getchar();
+				getReturn();
 
 			const auto featureType =
 				static_cast<cpuid::FeatureType::Enum>(
@@ -254,8 +305,6 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 		}
 	}
 
-	getchar();
-
 
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightGreen));
 	xos::printf("\nTesting PS-2 interface:\n");
@@ -269,5 +318,3 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightRed));
 	xos::printf("q pressed, returning to hlt\n");
 }
-
-_EXT_C_END

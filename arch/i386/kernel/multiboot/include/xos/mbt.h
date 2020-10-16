@@ -33,11 +33,16 @@ namespace mbt {
 	};
 
 	struct Boot {
-		uint32_t device;
+		union {
+			uint32_t device;
+			struct {
+				uint8_t partition[3], drive;
+			};
+		};
 	};
 
 	struct Command {
-		uint32_t line;
+		const char *line;
 	};
 
 	struct Modules {
@@ -61,7 +66,7 @@ namespace mbt {
 	};
 
 	struct BootLoader {
-		uint32_t name;
+		const char *name;
 	};
 
 	struct ApmTable {

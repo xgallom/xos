@@ -33,30 +33,32 @@
  * This ends up being the most efficient "calling
  * convention" on x86.
  */
+#include <xos/always-inline.h>
+
 /*
-#define do_div(n, base)                                                \
-({                                                                \
-        unsigned long __upper, __low, __high, __mod, __base;        \
-        __base = (base);                                        \
-        if (__builtin_constant_p(__base) && is_power_of_2(__base)) { \
-                __mod = n & (__base - 1);                        \
-                n >>= ilog2(__base);                                \
-        } else {                                                \
-                asm("" : "=a" (__low), "=d" (__high) : "A" (n));\
-                __upper = __high;                                \
-                if (__high) {                                        \
-                        __upper = __high % (__base);                \
-                        __high = __high / (__base);                \
-                }                                                \
-                asm("divl %2" : "=a" (__low), "=d" (__mod)        \
-                        : "rm" (__base), "0" (__low), "1" (__upper));        \
-                asm("" : "=A" (n) : "a" (__low), "d" (__high));        \
-        }                                                        \
+#define do_div(n, base)                                               \
+({                                                                    \
+        unsigned long __upper, __low, __high, __mod, __base;          \
+        __base = (base);                                              \
+        if (__builtin_constant_p(__base) && is_power_of_2(__base)) {  \
+                __mod = n & (__base - 1);                             \
+                n >>= ilog2(__base);                                  \
+        } else {                                                      \
+                asm("" : "=a" (__low), "=d" (__high) : "A" (n));      \
+                __upper = __high;                                     \
+                if (__high) {                                         \
+                        __upper = __high % (__base);                  \
+                        __high = __high / (__base);                   \
+                }                                                     \
+                asm("divl %2" : "=a" (__low), "=d" (__mod)            \
+                        : "rm" (__base), "0" (__low), "1" (__upper)); \
+                asm("" : "=A" (n) : "a" (__low), "d" (__high));       \
+        }                                                             \
         __mod;                                                        \
 })
 */
 
-inline uint64_t div64u(
+static _Inln uint64_t div64u(
 	uint64_t x,
 	uint32_t y,
 	uint32_t &remainder
@@ -79,9 +81,9 @@ inline uint64_t div64u(
 	}
 
 	asm(
-	"divl %2"
+	"divl %[y]"
 	: "=a"(buffer.low), "=d"(remainder)
-	: "rm"(y), "0"(buffer.low), "1"(high)
+	: [y]"rm"(y), "0"(buffer.low), "1"(high)
 	:
 	);
 

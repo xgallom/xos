@@ -54,6 +54,7 @@ namespace tty {
 
 	    default:
 		    s_frameBuffer[s_position++] = s_attributeMask | uint8_t(c);
+		    break;
 	    }
 
 	    if (s_position >= vga::Total) {

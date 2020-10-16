@@ -14,35 +14,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 //
-// Created by xgallom on 5/12/20.
+// Created by xgallom on 10/15/20.
 //
 
-#ifndef _XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PORT_H
-#define _XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PORT_H
+#ifndef _ARCH_I386_KERNEL_DESCRIPTORS_INCLUDE_XOS_DESCRIPTORS_H
+#define _ARCH_I386_KERNEL_DESCRIPTORS_INCLUDE_XOS_DESCRIPTORS_H
 
-#include <stdint.h>
-#include <xos/always-inline.h>
+#include "descriptors/gdt.h"
+#include "descriptors/idt.h"
 
-static _Inln void outb(uint16_t port, uint8_t value)
-{
-	asm volatile(
-	"outb %[value], %[port]\n"
-	:
-	: [value]"a"(value), [port]"Nd"(port)
-	:
-	);
-}
-
-static _Inln uint8_t inb(uint16_t port)
-{
-	volatile uint8_t value;
-	asm volatile(
-	"inb %[port], %[value]"
-	: [value]"=a"(value)
-	: [port]"Nd"(port)
-	);
-
-	return value;
-}
-
-#endif //_XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PORT_H
+#endif //_ARCH_I386_KERNEL_DESCRIPTORS_INCLUDE_XOS_DESCRIPTORS_H

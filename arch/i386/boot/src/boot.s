@@ -47,6 +47,8 @@ stack_top:
 .global _start
 .type _start, @function
 _start:
+    cli
+
     # Dump all segment registers for examination
     movl $xos_reg_dump_top, %esp
     movw %gs, %ax

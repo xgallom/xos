@@ -20,7 +20,7 @@
 #ifndef _XOS_ARCH_I386_KERNEL_CPUID_SRC_ISAVAILABLE_H
 #define _XOS_ARCH_I386_KERNEL_CPUID_SRC_ISAVAILABLE_H
 
-#include <xos/ext_c.h>
+#include <xos/extern-c.h>
 
 _EXT_C
 

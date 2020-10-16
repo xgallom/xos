@@ -32,64 +32,52 @@ namespace xos {
 	    return _TabOffset + sizeof(_TabOffset) - 1 - offset;
     }
 
-    extern void writeHex(char);
-    extern void writeHex(unsigned char);
-    extern void writeHex(short);
-    extern void writeHex(unsigned short);
-    extern void writeHex(int);
-    extern void writeHex(unsigned int);
-    extern void writeHex(long);
-    extern void writeHex(unsigned long);
-    extern void writeHex(long long);
-    extern void writeHex(unsigned long long);
+    void writeHex(char);
+    void writeHex(unsigned char);
+    void writeHex(short);
+    void writeHex(unsigned short);
+    void writeHex(int);
+    void writeHex(unsigned int);
+    void writeHex(long);
+    void writeHex(unsigned long);
+    void writeHex(long long);
+    void writeHex(unsigned long long);
 
-    extern void writeDec(char);
-    extern void writeDec(unsigned char);
-    extern void writeDec(short);
-    extern void writeDec(unsigned short);
-    extern void writeDec(int);
-    extern void writeDec(unsigned int);
-    extern void writeDec(long);
-    extern void writeDec(unsigned long);
-    extern void writeDec(long long);
-    extern void writeDec(unsigned long long);
+    void writeDec(char);
+    void writeDec(unsigned char);
+    void writeDec(short);
+    void writeDec(unsigned short);
+    void writeDec(int);
+    void writeDec(unsigned int);
+    void writeDec(long);
+    void writeDec(unsigned long);
+    void writeDec(long long);
+    void writeDec(unsigned long long);
 
-    extern void writeBin(char);
-    extern void writeBin(unsigned char);
-    extern void writeBin(short);
-    extern void writeBin(unsigned short);
-    extern void writeBin(int);
-    extern void writeBin(unsigned int);
-    extern void writeBin(long);
-    extern void writeBin(unsigned long);
-    extern void writeBin(long long);
-    extern void writeBin(unsigned long long);
+    void writeBin(char);
+    void writeBin(unsigned char);
+    void writeBin(short);
+    void writeBin(unsigned short);
+    void writeBin(int);
+    void writeBin(unsigned int);
+    void writeBin(long);
+    void writeBin(unsigned long);
+    void writeBin(long long);
+    void writeBin(unsigned long long);
 
-    extern bool write(
-	    const char *, char, const char *&, size_t);
-    extern bool write(
-	    const char *, unsigned char, const char *&, size_t);
-    extern bool write(
-	    const char *, short, const char *&, size_t);
-    extern bool write(
-	    const char *, unsigned short, const char *&, size_t);
-    extern bool write(
-	    const char *, int, const char *&, size_t);
-    extern bool write(
-	    const char *, unsigned int, const char *&, size_t);
-    extern bool write(
-	    const char *, long, const char *&, size_t);
-    extern bool write(
-	    const char *, unsigned long, const char *&, size_t);
-    extern bool write(
-	    const char *, long long, const char *&, size_t);
-    extern bool write(
-	    const char *, unsigned long long, const char *&, size_t);
+    bool write(const char *, char, const char *&, size_t);
+    bool write(const char *, unsigned char, const char *&, size_t);
+    bool write(const char *, short, const char *&, size_t);
+    bool write(const char *, unsigned short, const char *&, size_t);
+    bool write(const char *, int, const char *&, size_t);
+    bool write(const char *, unsigned int, const char *&, size_t);
+    bool write(const char *, long, const char *&, size_t);
+    bool write(const char *, unsigned long, const char *&, size_t);
+    bool write(const char *, long long, const char *&, size_t);
+    bool write(const char *, unsigned long long, const char *&, size_t);
 
-    extern bool write(
-	    const char *, bool, const char *&, size_t);
-    extern bool write(
-	    const char *, const char *, const char *&, size_t);
+    bool write(const char *, bool, const char *&, size_t);
+    bool write(const char *, const char *, const char *&, size_t);
 
     void write(const char *string);
     void write(const char *string, size_t count);

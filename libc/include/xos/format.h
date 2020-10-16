@@ -22,7 +22,6 @@
 
 #include "write.h"
 #include <stddef.h>
-#include <xos/utility.h>
 
 namespace xos {
     namespace _format {

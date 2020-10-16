@@ -21,7 +21,7 @@
 #define _XOS_LIBC_INCLUDE_STDIO_H
 
 #include <sys/cdefs.h>
-#include <xos/ext_c.h>
+#include <xos/extern-c.h>
 #include <xos/restrict.h>
 
 _EXT_C
