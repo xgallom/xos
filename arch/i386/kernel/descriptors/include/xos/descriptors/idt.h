@@ -21,14 +21,18 @@
 #define _ARCH_I386_KERNEL_DESCRIPTORS_IDT_INCLUDE_XOS_DESCRIPTORS_IDT_H
 
 #include <stddef.h>
+#include <xos/interrupt-handler.h>
 #include "idt/idtr.h"
 
 namespace idt {
     static constexpr size_t IdtEntryCount = 256;
 
     void storeIdtr();
-    void loadIdtr();
+    bool loadIdtr();
     const Idtr &idtr();
+
+    void __registerHandlerUnsafe(uint8_t irq, InterruptHandler *handler);
+    void registerHandler(uint8_t irq, InterruptHandler *handler);
 }
 
 #endif //_ARCH_I386_KERNEL_DESCRIPTORS_IDT_INCLUDE_XOS_DESCRIPTORS_IDT_H

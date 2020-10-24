@@ -18,6 +18,7 @@
 //
 
 #include <xos/mbt.h>
+#include <xos/stdio.h>
 
 namespace mbt {
     static constexpr uint32_t MagicMask = 0x2bad0000;
@@ -27,11 +28,21 @@ namespace mbt {
 
     bool initialize(uint32_t magic, uint32_t *multiboot)
     {
-	    if ((magic ^ MagicMask) >> 16u)
+	    if ((magic ^ MagicMask) >> 16u) {
+		    xos::printf("Invalid multiboot: 0x{x} 0x{x}\n",
+				magic,
+				uintptr_t(multiboot)
+		    );
 		    return false;
+	    }
 
 	    s_multiboot = *reinterpret_cast<Multiboot::Object *>(multiboot);
 
+	    xos::printf(
+		    "Initialized multiboot 0x{x} at 0x{x}\n",
+		    magic,
+		    uintptr_t(multiboot)
+	    );
 	    return true;
     }
 

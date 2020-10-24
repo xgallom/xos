@@ -427,4 +427,14 @@ namespace xos {
 	return EOF;
 #endif
     }
+
+    int getchar()
+    {
+#ifdef __xos_is_libk
+	    return tty::getchar();
+#else
+	    // TODO: Implement system call
+	    return EOF;
+#endif
+    }
 }

@@ -24,7 +24,7 @@
 #include "../descriptor-register.h"
 
 namespace gdt {
-    using Gdtr = DescriptorRegister<GdtEntry>;
+    using Gdtr = DescriptorRegister<const GdtEntry>;
     static_assert(sizeof(Gdtr) == Gdtr::Size, "Gdtr size mismatch");
 }
 

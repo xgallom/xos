@@ -14,23 +14,14 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 //
-// Created by xgallom on 5/25/20.
+// Created by xgallom on 10/23/20.
 //
 
-#ifndef _XOS_CORE_INCLUDE_XOS_UTILITY_H
-#define _XOS_CORE_INCLUDE_XOS_UTILITY_H
+#ifndef _ARCH_I386_KERNEL_ASM_INCLUDE_XOS_INTERRUPT_HANDLER_H
+#define _ARCH_I386_KERNEL_ASM_INCLUDE_XOS_INTERRUPT_HANDLER_H
 
-namespace xos {
-    constexpr size_t log2(size_t x)
-    {
-	    size_t y = 0;
-	    while (!(x & 1u)) {
-		    x >>= 1u;
-		    ++y;
-	    }
+#include <stdint.h>
 
-	    return y;
-    }
-}
+using InterruptHandler = void (uint32_t error, uint32_t irq);
 
-#endif //_XOS_CORE_INCLUDE_XOS_UTILITY_H
+#endif //_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_INTERRUPT_HANDLER_H

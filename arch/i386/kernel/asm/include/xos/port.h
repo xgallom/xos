@@ -45,4 +45,19 @@ static _Inln uint8_t inb(uint16_t port)
 	return value;
 }
 
+static _Inln void ioWait(void)
+{
+	asm volatile ( "outb %%al, $0x80" : : "a"(0));
+}
+
+static _Inln void setb(uint16_t port, uint8_t mask)
+{
+	outb(port, inb(port) | mask);
+}
+
+static _Inln void rstb(uint16_t port, uint8_t mask)
+{
+	outb(port, inb(port) & ~mask);
+}
+
 #endif //_XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PORT_H

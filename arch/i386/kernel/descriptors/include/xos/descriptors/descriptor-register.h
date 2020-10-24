@@ -28,10 +28,12 @@ struct _Pckd DescriptorRegister {
 	using DescriptorType = DescriptorType_;
 
 	uint16_t size;
-	const DescriptorType *address;
+	DescriptorType *address;
 
 	[[nodiscard]] inline
 	const DescriptorType *begin() const { return address; }
+	[[nodiscard]] inline
+	DescriptorType *begin() { return address; }
 
 	[[nodiscard]] inline
 	const DescriptorType *end() const
@@ -40,9 +42,19 @@ struct _Pckd DescriptorRegister {
 			reinterpret_cast<uintptr_t>(address) + size + 1
 		);
 	}
+	[[nodiscard]] inline
+	DescriptorType *end()
+	{
+		return reinterpret_cast<DescriptorType *>(
+			reinterpret_cast<uintptr_t>(address) + size + 1
+		);
+	}
+
+	DescriptorType &operator[](size_t n) { return address[n]; }
+	const DescriptorType &operator[](size_t n) const { return address[n]; }
 
 	template<size_t N>
-	void set(const DescriptorType (&descriptors)[N])
+	void set(DescriptorType (&descriptors)[N])
 	{
 		size = sizeof(descriptors) - 1;
 		address = descriptors;

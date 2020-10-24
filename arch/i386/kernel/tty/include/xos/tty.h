@@ -24,9 +24,11 @@
 #include <stdint.h>
 
 namespace tty {
-    void initialize();
+    bool initialize();
 
     void clear();
+
+    int getchar();
     void putchar(char c);
 
     void write(const char *data, size_t size);

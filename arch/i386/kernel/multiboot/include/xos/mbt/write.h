@@ -26,9 +26,9 @@
 namespace xos {
     bool write(const char *,
 	       mbt::Multiboot::Header arg,
+	       const char *&errorBuffer,
 	       size_t formatLength,
 	       size_t offsetIndex = 0);
-
 
     bool write(const char *,
 	       mbt::Multiboot::Memory arg,

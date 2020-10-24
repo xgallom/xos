@@ -98,8 +98,7 @@ namespace gdt {
     };
 
     static_assert(sizeof(GdtEntryAccess) == GdtEntryAccess::Size,
-		  "GdtEntryAccess size mismatch"
-    );
+		  "GdtEntryAccess size mismatch");
 
 
     struct _Pckd GdtEntryFlags {
@@ -134,8 +133,7 @@ namespace gdt {
     };
 
     static_assert(sizeof(GdtEntryFlags) == GdtEntryFlags::Size,
-		  "GdtEntryFlags size mismatch"
-    );
+		  "GdtEntryFlags size mismatch");
 
 
     struct _Pckd GdtEntry {

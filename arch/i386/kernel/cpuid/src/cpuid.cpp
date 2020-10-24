@@ -18,6 +18,7 @@
 //
 
 #include <xos/cpuid.h>
+#include <xos/stdio.h>
 #include "entry.h"
 #include "isAvailable.h"
 
@@ -38,6 +39,7 @@ namespace cpuid {
 	    requestOther(RequestType::IntelBrandStringMore);
 	    requestOther(RequestType::IntelBrandStringEnd);
 
+	    xos::printf("Initialized cpuid\n");
 	    return true;
     }
 }

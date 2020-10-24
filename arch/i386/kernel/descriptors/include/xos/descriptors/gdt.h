@@ -24,7 +24,7 @@
 
 namespace gdt {
     void storeGdtr();
-    void loadGdtr();
+    bool loadGdtr();
     const Gdtr &gdtr();
 
     namespace EntryIndex {

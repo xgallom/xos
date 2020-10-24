@@ -20,6 +20,7 @@
 #include <xos/tty.h>
 #include <xos/vga.h>
 #include <xos/string.h>
+#include <xos/drivers/ps2/keyboard.h>
 #include <stdint.h>
 
 namespace tty {
@@ -52,6 +53,11 @@ namespace tty {
 		    s_position += vga::TabLength - s_position % vga::TabLength;
 		    break;
 
+	    case '\b':
+		    if (s_position % vga::Width)
+			    s_frameBuffer[--s_position] = s_attributeMask;
+		    break;
+
 	    default:
 		    s_frameBuffer[s_position++] = s_attributeMask | uint8_t(c);
 		    break;
@@ -70,10 +76,11 @@ namespace tty {
 	    }
     }
 
-    void initialize()
+    bool initialize()
     {
 	    setColor(vga::ColorAttribute());
 	    clear();
+	    return true;
     }
 
     void clear()
@@ -82,6 +89,11 @@ namespace tty {
 
 	    vga::setCursorPosition((s_position = 0));
 	    vga::renderFrameBuffer(s_frameBuffer);
+    }
+
+    int getchar()
+    {
+	    return ps2::kbd::getchar();
     }
 
     void putchar(char c)

@@ -14,13 +14,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-file(GLOB_RECURSE files "src/*.cpp" "src/*.S")
+file(GLOB_RECURSE files "src/*.cpp")
 
-add_library(arch_kernel_descriptors STATIC ${files})
-target_include_directories(arch_kernel_descriptors PUBLIC include)
+add_library(arch_kernel_drivers STATIC ${files})
+target_include_directories(arch_kernel_drivers PUBLIC include)
 
-target_link_libraries(arch_kernel_descriptors PRIVATE
-        arch_kernel_asm
-        arch_kernel_drivers
+target_link_libraries(arch_kernel_drivers
+        PUBLIC core arch_kernel_asm
+        PRIVATE
+        arch_kernel_containers
+        arch_kernel_descriptors
         libk
         )

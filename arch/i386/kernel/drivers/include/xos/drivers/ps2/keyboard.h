@@ -14,23 +14,17 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 //
-// Created by xgallom on 5/25/20.
+// Created by xgallom on 10/23/20.
 //
 
-#ifndef _XOS_CORE_INCLUDE_XOS_UTILITY_H
-#define _XOS_CORE_INCLUDE_XOS_UTILITY_H
+#ifndef _ARCH_I386_KERNEL_DRIVERS_INCLUDE_XOS_DRIVERS_PS2_KEYBOARD_H
+#define _ARCH_I386_KERNEL_DRIVERS_INCLUDE_XOS_DRIVERS_PS2_KEYBOARD_H
 
-namespace xos {
-    constexpr size_t log2(size_t x)
-    {
-	    size_t y = 0;
-	    while (!(x & 1u)) {
-		    x >>= 1u;
-		    ++y;
-	    }
+#include <stdint.h>
 
-	    return y;
-    }
+namespace ps2::kbd {
+    bool initialize();
+    int getchar();
 }
 
-#endif //_XOS_CORE_INCLUDE_XOS_UTILITY_H
+#endif //_ARCH_I386_KERNEL_DRIVERS_INCLUDE_XOS_DRIVERS_PS2_KEYBOARD_H

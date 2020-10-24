@@ -23,5 +23,6 @@
 #include <xos/always-inline.h>
 
 static _Inln void pause() { asm volatile("pause"); }
+static _Inln void halt() { asm volatile("hlt"); }
 
 #endif //_XOS_ARCH_I386_KERNEL_ASM_INCLUDE_XOS_PAUSE_H

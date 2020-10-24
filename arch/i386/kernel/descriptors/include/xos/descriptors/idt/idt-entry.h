@@ -45,8 +45,7 @@ namespace idt {
     };
 
     static_assert(sizeof(IdtEntryFlags) == IdtEntryFlags::Size,
-		  "IdtEntryFlags size mismatch"
-    );
+		  "IdtEntryFlags size mismatch");
 
 
     struct _Pckd IdtEntry {
@@ -84,6 +83,17 @@ namespace idt {
 		    type{type},
 		    flags{uint8_t(flags)},
 		    offset1{uint16_t((offset >> 16u) & 0xffffu)} {}
+
+	    [[nodiscard]] inline uint32_t offset() const
+	    {
+		    return (uint32_t(offset1) << 16u) | uint32_t(offset0);
+	    }
+
+	    inline void setOffset(uint32_t offset)
+	    {
+		    offset0 = uint16_t(offset & 0xffffu);
+		    offset1 = uint16_t((offset >> 16u) & 0xffffu);
+	    }
 
 	    static constexpr size_t Size = sizeof(uint64_t);
     };

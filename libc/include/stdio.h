@@ -31,6 +31,7 @@ _EXT_C
 int printf(const char *_Rstr format, ...);
 int putchar(int value);
 int puts(const char *str);
+int getchar();
 
 _EXT_C_END
 

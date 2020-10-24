@@ -182,3 +182,8 @@ int puts(const char *string)
 	xos::putchar('\n');
 	return 0;
 }
+
+int getchar()
+{
+	return xos::getchar();
+}

@@ -82,6 +82,7 @@ namespace xos {
     void write(const char *string);
     void write(const char *string, size_t count);
     void putchar(char c);
+    int getchar();
 }
 
 #endif //_XOS_LIBC_INCLUDE_XOS_WRITE_H

@@ -55,7 +55,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${COMMON_FLAGS} \
 -fno-exceptions -fno-rtti -nostdlib")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} \
--fno-exceptions -fno-rtti \
+-fno-exceptions -fno-rtti -fconcepts \
 -Wmultiple-inheritance -Wuseless-cast -Wimplicit-fallthrough=5")
 
 

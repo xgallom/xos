@@ -21,9 +21,12 @@
 #include <xos/descriptors/gdt.h>
 #include <xos/string.h>
 #include <xos/interrupt-enable.h>
+#include <xos/drivers/pic8259.h>
+#include <xos/stdio.h>
 
 _EXT_C
-extern const uintptr_t __isr_handler_table[];
+extern const uintptr_t __isr_offset_table[idt::IdtEntryCount];
+extern InterruptHandler *__isr_handler_table[idt::IdtEntryCount];
 _EXT_C_END
 
 namespace idt {
@@ -40,16 +43,17 @@ namespace idt {
 	    );
     }
 
-    void loadIdtr()
+    bool loadIdtr()
     {
-	    const auto *handler = __isr_handler_table;
-	    for (auto &entry : s_idt)
+	    const auto *offset = __isr_offset_table;
+	    for (auto &entry : s_idt) {
 		    entry = IdtEntry(
 			    gdt::selector(gdt::EntryIndex::KernelCode),
-			    *handler++,
+			    *offset++,
 			    IdtEntry::Type32InterruptGate,
 			    IdtEntryFlags(0)
 		    );
+	    }
 
 	    s_idtr.set(s_idt);
 
@@ -59,11 +63,23 @@ namespace idt {
 	    : [idtr]"m"(s_idtr)
 	    );
 
-	    enableInterrupts();
+	    xos::printf("Loaded idt at 0x{x}\n", uintptr_t(s_idtr.address));
+	    return true;
     }
 
     const Idtr &idtr()
     {
 	    return s_idtr;
+    }
+
+    void __registerHandlerUnsafe(uint8_t irq, InterruptHandler *handler)
+    {
+	    __isr_handler_table[irq] = handler;
+    }
+
+    void registerHandler(uint8_t irq, InterruptHandler *handler)
+    {
+	    InterruptGuard interruptGuard;
+	    __registerHandlerUnsafe(irq, handler);
     }
 }

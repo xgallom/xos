@@ -18,6 +18,7 @@
 //
 
 #include <xos/descriptors/gdt.h>
+#include <xos/stdio.h>
 
 namespace gdt {
     static constexpr GdtEntry s_gdt[] = {
@@ -61,7 +62,7 @@ namespace gdt {
 	    );
     }
 
-    void loadGdtr()
+    bool loadGdtr()
     {
 	    s_gdtr.set(s_gdt);
 
@@ -88,6 +89,9 @@ namespace gdt {
 	    :
 	    : [code]"i"(KernelCodeSelector), [data]"i"(KernelDataSelector)
 	    );
+
+	    xos::printf("Loaded gdt at 0x{x}\n", uintptr_t(s_gdtr.address));
+	    return true;
     }
 
     const Gdtr &gdtr()
