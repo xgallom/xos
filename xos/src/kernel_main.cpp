@@ -26,7 +26,6 @@
 #include <xos/vga.h>
 #include <xos/drivers/pic8259.h>
 #include <xos/drivers/ps2/keyboard.h>
-#include <xos/interrupt-enable.h>
 #include <xos/cpuid.h>
 #include <xos/stdio.h>
 #include <stdio.h>
@@ -109,8 +108,7 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 
 	const auto end = mbt::memoryMap()->address + mbt::memoryMap()->length;
 	for (auto entry = MemoryMapEntry::Get(mbt::memoryMap()->address);
-	     entry; entry = entry->next(end)) {
-		getchar();
+	     entry; entry = entry->next(end))
 		xos::printf(
 			"size: {}, baseAddress: {x}, length: {x}, type: {}\n",
 			entry->size,
@@ -118,12 +116,9 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 			size_t(entry->length),
 			entry->type
 		);
-	}
 
 	xos::printf("\n{}\n\n", &mbt::entry());
 
-	for (int n = 0; (n & 0xff) != 'q';) {
-		n = getchar();
+	for (int n = getchar(); n != 'q'; n = getchar())
 		putchar(n);
-	}
 }

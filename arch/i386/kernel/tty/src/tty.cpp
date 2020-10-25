@@ -33,6 +33,7 @@ namespace tty {
 		    position = 0,
 		    attributeMask = 0;
     } static s_state = {};
+
     static uint16_t s_frameBuffer[FrameBufferSize + vga::Default::Total] = {};
 
 
@@ -72,6 +73,48 @@ namespace tty {
 	    return y * vga::config().width + x;
     }
 
+    static void updateOverlay()
+    {
+	    const uint16_t
+		    col = position() % vga::config().width,
+		    row = (frameStart() + position()) / vga::config().width,
+		    attr = vga::ColorAttribute(vga::Color::White,
+					       vga::Color::Red) << 8u,
+		    overlay[] = {
+		    attr | ' ',
+		    uint16_t(attr | ('0' + col / 10)),
+		    uint16_t(attr | ('0' + col % 10)),
+		    attr | ':',
+		    uint16_t(attr | ('0' + row / 10)),
+		    uint16_t(attr | ('0' + row % 10)),
+		    attr | ' '};
+
+	    constexpr auto size = sizeof(overlay) / sizeof(uint16_t);
+
+	    xos::memcpy(
+		    vga::config().frameBuffer + vga::config().total - size,
+		    overlay,
+		    size);
+    }
+
+    static void renderFrameBuffer()
+    {
+	    vga::renderFrameBuffer(frame());
+	    updateOverlay();
+    }
+
+    static void setCursorPosition()
+    {
+	    updateOverlay();
+	    vga::setCursorPosition(position());
+    }
+
+    static void setCursorPosition(uint16_t value)
+    {
+	    position() = value;
+	    setCursorPosition();
+    }
+
     static void internal_putchar(int c)
     {
 	    switch (uint8_t(c)) {
@@ -96,7 +139,7 @@ namespace tty {
 		    frameStart() += vga::config().width;
 		    position() -= vga::config().width;
 
-		    if(uint16_t(frameStart() + position()) < frameStart())
+		    if (uint16_t(frameStart() + position()) < frameStart())
 			    frameStart() = 0;
 	    }
     }
@@ -114,8 +157,8 @@ namespace tty {
 	    frameStart() = 0;
 	    xos::memset(frame(), attributeMask(), FrameBufferSize);
 
-	    vga::setCursorPosition((position() = 0));
-	    vga::renderFrameBuffer(frame());
+	    renderFrameBuffer();
+	    setCursorPosition(0);
     }
 
     int getchar()
@@ -135,6 +178,7 @@ namespace tty {
 			    position() += alignMissing(position(),
 						       vga::config().width) - 1;
 			    break;
+
 		    case '9' | State::CharMask<State::E0>():
 			    frameStart() -= vga::config().total;
 			    update = true;
@@ -143,6 +187,7 @@ namespace tty {
 			    frameStart() += vga::config().total;
 			    update = true;
 			    break;
+
 		    case '8' | State::CharMask<State::E0>():
 			    if (position() < vga::config().width) {
 				    frameStart() -= vga::config().width;
@@ -160,6 +205,7 @@ namespace tty {
 			    else
 				    position() += vga::config().width;
 			    break;
+
 		    case '6' | State::CharMask<State::E0>():
 			    if (++position() >= vga::config().total) {
 				    frameStart() += vga::config().width;
@@ -174,17 +220,26 @@ namespace tty {
 				    update = true;
 			    }
 			    break;
+		    case '.' | State::CharMask<State::E0>():
+			    frame(position()++) = attributeMask();
+			    update = true;
+		            break;
 
 		    default:
 			    return key;
 		    }
 
-		    if(uint16_t(frameStart() + position()) < frameStart())
-		    	frameStart() = 0;
+		    if (uint16_t(frameStart() +
+				 vga::config().total +
+				 vga::config().width) < frameStart()
+			    ) {
+			    frameStart() = position() = 0;
+			    update = true;
+		    }
 
-		    vga::setCursorPosition(position());
 		    if (update)
-			    vga::renderFrameBuffer(frame());
+			    renderFrameBuffer();
+		    setCursorPosition();
 	    }
     }
 
@@ -192,8 +247,8 @@ namespace tty {
     {
 	    internal_putchar(c);
 
-	    vga::setCursorPosition(position());
-	    vga::renderFrameBuffer(frame());
+	    renderFrameBuffer();
+	    setCursorPosition();
     }
 
     void write(const char *data, size_t size)
@@ -205,8 +260,8 @@ namespace tty {
 		    internal_putchar(*data++);
 	    while (--size);
 
-	    vga::setCursorPosition(position());
-	    vga::renderFrameBuffer(frame());
+	    renderFrameBuffer();
+	    setCursorPosition();
     }
 
     void write(const char *data)
@@ -220,8 +275,8 @@ namespace tty {
 		    internal_putchar(character);
 	    while ((character = *++data));
 
-	    vga::setCursorPosition(position());
-	    vga::renderFrameBuffer(frame());
+	    renderFrameBuffer();
+	    setCursorPosition();
     }
 
     void setColor(uint8_t color)
@@ -231,11 +286,11 @@ namespace tty {
 
     void setCursor(uint16_t newPosition)
     {
-	    vga::setCursorPosition((position() = newPosition));
+	    setCursorPosition(newPosition);
     }
 
     void setCursor(uint8_t x, uint8_t y)
     {
-	    vga::setCursorPosition((position() = index(x, y)));
+	    setCursorPosition(index(x, y));
     }
 }

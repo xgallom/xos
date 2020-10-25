@@ -495,8 +495,6 @@ namespace xos {
 	    xos::write("", arg->header, errorBuffer, 0, newOffsetIndex);
 	    xos::write("\n");
 
-	    xos::getchar();
-
 	    const auto flags = arg->header.flags;
 
 	    if (flags & (0x1u << 0u)) {
@@ -504,16 +502,12 @@ namespace xos {
 		    xos::write("memory: ");
 		    xos::write("", arg->memory, errorBuffer, 0, newOffsetIndex);
 		    xos::write("\n");
-
-		    xos::getchar();
 	    }
 	    if (flags & (0x1u << 1u)) {
 		    xos::write(newOffset);
 		    xos::write("boot: ");
 		    xos::write("", arg->boot, errorBuffer, 0, newOffsetIndex);
 		    xos::write("\n");
-
-		    xos::getchar();
 	    }
 	    if (flags & (0x1u << 2u)) {
 		    xos::write(newOffset);
@@ -521,8 +515,6 @@ namespace xos {
 		    xos::write("", arg->command, errorBuffer, 0,
 			       newOffsetIndex);
 		    xos::write("\n");
-
-		    xos::getchar();
 	    }
 	    if (flags & (0x1u << 3u)) {
 		    xos::write(newOffset);
@@ -530,8 +522,6 @@ namespace xos {
 		    xos::write("", arg->modules, errorBuffer, 0,
 			       newOffsetIndex);
 		    xos::write("\n");
-
-		    xos::getchar();
 	    }
 	    if (flags & (0x3u << 4u)) {
 		    xos::write(newOffset);
@@ -539,8 +529,6 @@ namespace xos {
 		    xos::write("", arg->symbols, errorBuffer, 0,
 			       newOffsetIndex);
 		    xos::write("\n");
-
-		    xos::getchar();
 	    }
 	    if (flags & (0x1u << 6u)) {
 		    xos::write(newOffset);
@@ -548,8 +536,6 @@ namespace xos {
 		    xos::write("", arg->memoryMap, errorBuffer, 0,
 			       newOffsetIndex);
 		    xos::write("\n");
-
-		    xos::getchar();
 	    }
 	    if (flags & (0x1u << 7u)) {
 		    xos::write(newOffset);
@@ -557,8 +543,6 @@ namespace xos {
 		    xos::write("", arg->drives, errorBuffer, 0,
 			       newOffsetIndex);
 		    xos::write("\n");
-
-		    xos::getchar();
 	    }
 	    if (flags & (0x1u << 8u)) {
 		    xos::write(newOffset);
@@ -566,8 +550,6 @@ namespace xos {
 		    xos::write("", arg->config, errorBuffer, 0,
 			       newOffsetIndex);
 		    xos::write("\n");
-
-		    xos::getchar();
 	    }
 	    if (flags & (0x1u << 9u)) {
 		    xos::write(newOffset);
@@ -575,8 +557,6 @@ namespace xos {
 		    xos::write("", arg->bootLoader, errorBuffer, 0,
 			       newOffsetIndex);
 		    xos::write("\n");
-
-		    xos::getchar();
 	    }
 	    if (flags & (0x1u << 10u)) {
 		    xos::write(newOffset);
@@ -584,8 +564,6 @@ namespace xos {
 		    xos::write("", arg->apmTable, errorBuffer, 0,
 			       newOffsetIndex);
 		    xos::write("\n");
-
-		    xos::getchar();
 	    }
 	    if (flags & (0x1u << 11u)) {
 		    xos::write(newOffset);
@@ -593,8 +571,6 @@ namespace xos {
 		    xos::write("", arg->vbe, errorBuffer, 0,
 			       newOffsetIndex);
 		    xos::write("\n");
-
-		    xos::getchar();
 	    }
 	    if (flags & (0x1u << 12u)) {
 		    xos::write(newOffset);
@@ -602,8 +578,6 @@ namespace xos {
 		    xos::write("", arg->frameBuffer, errorBuffer, 0,
 			       newOffsetIndex);
 		    xos::write("\n");
-
-		    xos::getchar();
 	    }
 
 	    xos::write(offset);
