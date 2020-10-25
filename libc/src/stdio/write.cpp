@@ -418,7 +418,7 @@ namespace xos {
 #endif
     }
 
-    void putchar(char c)
+    void putchar(int c)
     {
 #ifdef __xos_is_libk
 	    tty::putchar(c);

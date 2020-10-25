@@ -43,9 +43,10 @@ namespace cpuid {
 
     static constexpr size_t
 	    ResultLength = 4,
-	    ResultByteLength = sizeof(uint32_t) * ResultLength;
+	    ResultByteLength = sizeof(uint32_t) * (ResultLength - 1);
 
     const uint32_t *entry(RequestType::Enum request);
+    const char *stringEntry(RequestType::Enum request);
     const char *entryName(RequestType::Enum request);
     uint32_t entryRequest(RequestType::Enum request);
 }

@@ -106,7 +106,10 @@ namespace mbt {
     }
 
     bool initialize(uint32_t magic, uint32_t *multiboot);
+
     const Multiboot::Object &entry();
+    const Multiboot::MemoryMap *memoryMap();
+    const Multiboot::FrameBuffer *frameBuffer();
 }
 
 #endif //_XOS_ARCH_I386_KERNEL_MULTIBOOT_INCLUDE_XOS_MBT_H

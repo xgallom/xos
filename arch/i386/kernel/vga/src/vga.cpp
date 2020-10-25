@@ -20,12 +20,14 @@
 #include <xos/vga.h>
 #include <xos/port.h>
 #include <xos/string.h>
+#include <xos/mbt.h>
 
 namespace vga {
-    static constexpr uintptr_t BufferAddress = 0xb8000;
     static constexpr uint16_t
 	    CRTCAddressRegister = 0x3d4,
 	    CRTCDataRegister = 0x3d5;
+
+    static Config s_config = {};
 
     namespace CRTC {
 	enum Enum : uint8_t {
@@ -34,26 +36,43 @@ namespace vga {
 	};
     }
 
-    static inline uint16_t *vgaBuffer()
-    {
-	    return reinterpret_cast<uint16_t *>(BufferAddress);
-    }
-
     static inline void writeRegister(CRTC::Enum address, uint8_t value)
     {
 	    outb(CRTCAddressRegister, address);
 	    outb(CRTCDataRegister, value);
     }
 
+    bool initialize()
+    {
+	    if (const auto mbtInfo = mbt::frameBuffer(); mbtInfo) {
+		    s_config = {
+			    .width = uint16_t(mbtInfo->width),
+			    .height = uint16_t(mbtInfo->height),
+			    .total = uint16_t(mbtInfo->width * mbtInfo->height),
+			    .tabLength = Default::TabLength,
+			    .frameBuffer = reinterpret_cast<uint16_t *>(
+				    uintptr_t(mbtInfo->address)
+			    )
+		    };
+	    }
+
+	    return true;
+    }
+
     void renderFrameBuffer(const uint16_t *frameBuffer)
     {
-	    xos::memcpy(vgaBuffer(), frameBuffer, Total);
+	    xos::memcpy(s_config.frameBuffer, frameBuffer, s_config.total);
     }
 
     void setCursorPosition(uint16_t position)
     {
 	    writeRegister(CRTC::CursorLocationHigh, (position >> 8u) & 0xffu);
 	    writeRegister(CRTC::CursorLocationLow, position & 0xffu);
+    }
+
+    const Config &config()
+    {
+	    return s_config;
     }
 }
 

@@ -28,26 +28,30 @@ namespace mbt {
 
     bool initialize(uint32_t magic, uint32_t *multiboot)
     {
-	    if ((magic ^ MagicMask) >> 16u) {
-		    xos::printf("Invalid multiboot: 0x{x} 0x{x}\n",
-				magic,
-				uintptr_t(multiboot)
-		    );
+	    if ((magic ^ MagicMask) >> 16u)
 		    return false;
-	    }
 
 	    s_multiboot = *reinterpret_cast<Multiboot::Object *>(multiboot);
 
-	    xos::printf(
-		    "Initialized multiboot 0x{x} at 0x{x}\n",
-		    magic,
-		    uintptr_t(multiboot)
-	    );
 	    return true;
     }
 
     const Multiboot::Object &entry()
     {
 	    return s_multiboot;
+    }
+
+    const Multiboot::MemoryMap *memoryMap()
+    {
+	    return s_multiboot.header.flags & (0x1u << 6u) ?
+		   &s_multiboot.memoryMap :
+		   nullptr;
+    }
+
+    const Multiboot::FrameBuffer *frameBuffer()
+    {
+	    return s_multiboot.header.flags & (0x1u << 12u) ?
+		   &s_multiboot.frameBuffer :
+		   nullptr;
     }
 }

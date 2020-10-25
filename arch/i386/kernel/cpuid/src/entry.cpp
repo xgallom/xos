@@ -80,6 +80,13 @@ namespace cpuid {
 	    return s_result[request];
     }
 
+    const char *stringEntry(RequestType::Enum request)
+    {
+	    return reinterpret_cast<const char *>(
+			   s_result[request]
+		   ) + sizeof(uint32_t);
+    }
+
     const char *entryName(RequestType::Enum request)
     {
 	    return RequestTypeNameMap[request];

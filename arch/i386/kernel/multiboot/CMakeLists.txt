@@ -19,4 +19,4 @@ file(GLOB_RECURSE files "src/*.cpp")
 add_library(arch_kernel_mbt STATIC ${files})
 target_include_directories(arch_kernel_mbt PUBLIC include)
 
-target_link_libraries(arch_kernel_mbt PRIVATE libk)
+target_link_libraries(arch_kernel_mbt PUBLIC libk)

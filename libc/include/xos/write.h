@@ -81,7 +81,7 @@ namespace xos {
 
     void write(const char *string);
     void write(const char *string, size_t count);
-    void putchar(char c);
+    void putchar(int c);
     int getchar();
 }
 

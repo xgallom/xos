@@ -29,7 +29,7 @@ namespace tty {
     void clear();
 
     int getchar();
-    void putchar(char c);
+    void putchar(int c);
 
     void write(const char *data, size_t size);
     void write(const char *data);

@@ -23,56 +23,6 @@
 #include <stdint.h>
 
 namespace ps2::kbd {
-    struct State {
-	    enum Flags : size_t {
-		    LShift,
-		    RShift,
-		    LCtrl,
-		    RCtrl,
-		    LAlt,
-		    RAlt,
-		    GotE0,
-
-		    FlagsCount
-	    };
-
-	    template<Flags ... Flag>
-	    static constexpr uint32_t Mask()
-	    {
-		    return ((1u << Flag) | ...);
-	    }
-
-	    template<Flags ... Flag>
-	    static constexpr uint32_t CharMask()
-	    {
-		    return ((1u << Flag) | ...) << 8u;
-	    }
-
-	    template<Flags ... Flag>
-	    static constexpr bool get(uint32_t value)
-	    {
-		    return value & Mask<Flag...>();
-	    }
-
-	    template<Flags ... Flag>
-	    static constexpr void set(uint32_t &value)
-	    {
-		    value |= Mask<Flag...>();
-	    }
-
-	    template<Flags ... Flag>
-	    static constexpr void rst(uint32_t &value)
-	    {
-		    value &= ~Mask<Flag...>();
-	    }
-
-	    template<Flags ... Flag>
-	    static constexpr void tgl(uint32_t &value)
-	    {
-		    value ^= Mask<Flag...>();
-	    }
-    };
-
     namespace ScanCode {
 	enum Enum : uint8_t {
 		Error0,

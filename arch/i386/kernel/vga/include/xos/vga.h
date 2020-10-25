@@ -50,11 +50,27 @@ namespace vga {
 		CombinationOffset = Offset << 1u;
     }
 
-    static constexpr uint16_t
-	    Width = 80,
-	    Height = 25,
-	    Total = Width * Height,
-	    TabLength = 8;
+    namespace Default {
+	static constexpr uint16_t
+		Width = 80,
+		Height = 25,
+		Total = Width * Height,
+		TabLength = 8;
+	static constexpr uintptr_t FrameBuffer = 0xb8000;
+    }
+
+    struct Config {
+	    uint16_t
+		    width = Default::Width,
+		    height = Default::Height,
+		    total = Default::Total,
+		    tabLength = Default::TabLength;
+	    uint16_t
+		    *frameBuffer =
+		    reinterpret_cast<uint16_t *>(
+			    Default::FrameBuffer
+		    );
+    };
 
     inline constexpr
     uint8_t ColorAttribute(Color::Enum fg = Color::Gray,
@@ -63,8 +79,12 @@ namespace vga {
 	    return fg | (bg << Color::Offset);
     }
 
+    bool initialize();
+
     void renderFrameBuffer(const uint16_t *frameBuffer);
     void setCursorPosition(uint16_t position);
+
+    const Config &config();
 }
 
 #endif //_XOS_ARCH_I386_KERNEL_VGA_INCLUDE_XOS_VGA_H

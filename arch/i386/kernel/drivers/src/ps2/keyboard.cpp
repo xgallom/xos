@@ -53,6 +53,8 @@ namespace ps2::kbd {
 	    while (!(result = popScanCode()))
 		    halt();
 
+//	    xos::printf(" {} ", result);
+
 	    return result;
     }
 
@@ -60,16 +62,17 @@ namespace ps2::kbd {
     {
 	    const bool
 		    isReleased = scanCode & 0x80u,
-		    e0 = State::get<State::GotE0>(s_state);
+		    e0 = State::get<State::E0>(s_state);
 	    const uint8_t
 		    alt = State::get<State::LAlt, State::RAlt>(s_state),
 		    shift = State::get<State::LShift, State::RShift>(s_state),
+		    capsLock = State::get<State::CapsLock>(s_state),
 		    scanIndex = scanCode & ~0x80u;
 
 	    int result = 0;
 
 	    if (scanCode == 0xe0)
-		    State::set<State::GotE0>(s_state);
+		    State::set<State::E0>(s_state);
 	    else if (!isReleased) {
 		    switch (scanIndex) {
 		    case ScanCode::LShift:
@@ -85,14 +88,18 @@ namespace ps2::kbd {
 				    State::set<State::LAlt>(s_state);
 			    break;
 		    case ScanCode::LCtrl:
-			    if (State::get<State::GotE0>(s_state))
+			    if (State::get<State::E0>(s_state))
 				    State::set<State::RCtrl>(s_state);
 			    else
 				    State::set<State::LCtrl>(s_state);
 			    break;
+		    case ScanCode::CapsLock:
+			    State::tgl<State::CapsLock>(s_state);
+			    break;
+
 		    default:
 			    result = ScanCode::CharacterMap[
-				    (alt << 1u) | shift
+				    (alt << 1u) | (shift ^ capsLock)
 			    ][scanIndex];
 
 			    if (result)
@@ -100,7 +107,7 @@ namespace ps2::kbd {
 			    break;
 		    }
 
-		    State::rst<State::GotE0>(s_state);
+		    State::rst<State::E0>(s_state);
 	    }
 	    else {
 		    switch (scanIndex) {
@@ -117,14 +124,14 @@ namespace ps2::kbd {
 				    State::rst<State::LAlt>(s_state);
 			    break;
 		    case ScanCode::LCtrl:
-			    if (State::get<State::GotE0>(s_state))
+			    if (State::get<State::E0>(s_state))
 				    State::rst<State::RCtrl>(s_state);
 			    else
 				    State::rst<State::LCtrl>(s_state);
 			    break;
 		    }
 
-		    State::rst<State::GotE0>(s_state);
+		    State::rst<State::E0>(s_state);
 	    }
 
 //	    xos::printf("{x} {b} {x}\n", scanCode, s_state, result);
@@ -157,12 +164,13 @@ namespace ps2::kbd {
 					     keyboardInterrupt);
 
 	    xos::printf("Initialized ps2/keyboard\n");
+
 	    return true;
     }
 
     int getchar()
     {
-	    char result;
+	    int result;
 	    while (!(result = processScanCode(pollScanCode()))) {}
 	    return result;
     }

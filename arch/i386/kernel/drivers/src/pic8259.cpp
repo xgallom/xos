@@ -153,6 +153,5 @@ namespace pic8259 {
 
 void pic8259_sendEndOfInterrupt(uint32_t irq, uint32_t)
 {
-	xos::printf("pic[{x}]: default\n", uint8_t(irq));
 	pic8259::sendEndOfInterrupt(irq);
 }

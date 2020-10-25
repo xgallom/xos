@@ -37,34 +37,66 @@ void kernel_main(uint32_t magic, uint32_t *multiboot);
 
 _EXT_C_END
 
+static constexpr char
+	Name[] =
+	"\nxos operating system v0.1.0\n",
+	Copyright[] =
+	"Copyright (C) 2020 Milan Gallo <gallo.milan.jr@gmail.com>\n"
+	"\n",
+	License[] =
+	"This program is free software: you can redistribute it and/or modify\n"
+	"it under the terms of the GNU General Public License as published by\n"
+	"the Free Software Foundation, version 2.\n"
+	"\n"
+	"This program is distributed in the hope that it will be useful,\n"
+	"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+	"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+	"GNU General Public License for more details.\n"
+	"\n"
+	"You should have received a copy of the GNU General Public License\n"
+	"along with this program.  If not, see <https:www.gnu.org/licenses/>.\n"
+	"\n"
+	"\n";
+
 static bool printWelcome()
 {
-	tty::setColor(vga::ColorAttribute(vga::Color::BrightMagenta,
-					  vga::Color::Blue));
-	tty::write(" xos v0.0.1 ");
-
-	tty::setColor(vga::ColorAttribute(vga::Color::BrightMagenta));
-	tty::write(" greets your bitch ass.\n");
+	tty::setColor(vga::ColorAttribute(vga::Color::BrightRed));
+	printf(Name);
 
 	tty::setColor(vga::ColorAttribute(vga::Color::BrightBlue));
-	tty::write("Copyright Milan Gallo 2020.\n\n");
+	printf(Copyright);
 
 	tty::setColor(vga::ColorAttribute());
+	printf(License);
 
 	return true;
 }
 
-static void getReturn()
-{
-	while (getchar() != '\n') {}
-}
+struct MemoryMapEntry {
+	size_t size;
+	uint64_t baseAddress;
+	uint64_t length;
+	uint32_t type;
+
+	static const MemoryMapEntry *Get(uintptr_t address)
+	{
+		return reinterpret_cast<const MemoryMapEntry *>(address);
+	}
+
+	[[nodiscard]] const MemoryMapEntry *next(uintptr_t end) const
+	{
+		const auto next = uintptr_t(this) + size + 4;
+		return next < end ? Get(next) : nullptr;
+	}
+};
 
 void kernel_main(uint32_t magic, uint32_t *multiboot)
 {
 	if (!(
+		mbt::initialize(magic, multiboot) &&
+		vga::initialize() &&
 		tty::initialize() &&
 		printWelcome() &&
-		mbt::initialize(magic, multiboot) &&
 		gdt::loadGdtr() &&
 		idt::loadIdtr() &&
 		pic8259::initialize() &&
@@ -73,17 +105,25 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 	))
 		return;
 
-	enableInterrupts();
-	getReturn();
+	putchar('\n');
 
-	for (auto n = 0; n < 256; ++n)
-		printf("%d:%c ", n, n);
+	const auto end = mbt::memoryMap()->address + mbt::memoryMap()->length;
+	for (auto entry = MemoryMapEntry::Get(mbt::memoryMap()->address);
+	     entry; entry = entry->next(end)) {
+		getchar();
+		xos::printf(
+			"size: {}, baseAddress: {x}, length: {x}, type: {}\n",
+			entry->size,
+			uintptr_t(entry->baseAddress),
+			size_t(entry->length),
+			entry->type
+		);
+	}
 
-	for (auto n = 0; (n & 0xff) != 'q'; n = getchar())
+	xos::printf("\n{}\n\n", &mbt::entry());
+
+	for (int n = 0; (n & 0xff) != 'q';) {
+		n = getchar();
 		putchar(n);
-
-/*
-	const char *tmp = nullptr;
-	xos::write("", &mbt::entry(), tmp, 0);
-*/
+	}
 }

@@ -22,5 +22,5 @@ target_include_directories(arch_kernel_tty PUBLIC include)
 target_link_libraries(arch_kernel_tty PRIVATE
         arch_kernel_drivers
         arch_kernel_vga
-        libk
+        arch_kernel_containers
         )

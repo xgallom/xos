@@ -39,7 +39,11 @@ namespace cpuid {
 	    requestOther(RequestType::IntelBrandStringMore);
 	    requestOther(RequestType::IntelBrandStringEnd);
 
-	    xos::printf("Initialized cpuid\n");
+	    xos::printf("Initialized cpuid: \"");
+	    xos::write(stringEntry(RequestType::GetVendorString),
+		       ResultByteLength
+	    );
+	    xos::write("\"\n");
 	    return true;
     }
 }

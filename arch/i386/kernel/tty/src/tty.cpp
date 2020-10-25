@@ -22,57 +22,82 @@
 #include <xos/string.h>
 #include <xos/drivers/ps2/keyboard.h>
 #include <stdint.h>
+#include <xos/always-inline.h>
 
 namespace tty {
-    // Frame buffer is uint16_t, because vga maps attribute plane interwoven
-    //  with character plane.
-    // Even byte is attribute, and odd byte is character of specific screen
-    //  position, so screen characters can map to words that have attribute in
-    //  high byte and character in low byte.
+    static constexpr size_t FrameBufferSize = 1u << (sizeof(uint16_t) * 8);
 
-    // Frame buffer has one more empty row.
-    // On having full buffer, whole screen is copied one row up, along with the
-    //  spare row, which fills the last row with empty characters
-    static uint16_t s_frameBuffer[vga::Total + vga::Width] = {};
+    struct State {
+	    uint16_t
+		    frameStart = 0,
+		    position = 0,
+		    attributeMask = 0;
+    } static s_state = {};
+    static uint16_t s_frameBuffer[FrameBufferSize + vga::Default::Total] = {};
 
-    static uint16_t s_position = 0;
 
-    // Attributes are stored in the higher byte so they don't have to be shifted
-    //  on every write, only on every setColor.
-    static uint16_t s_attributeMask = 0;
+    [[nodiscard]] static _Inln
+    uint16_t *frame() { return s_frameBuffer + s_state.frameStart; }
 
-    static void internal_putchar(char c)
+    [[nodiscard]] static _Inln
+    uint16_t &frame(int offset) { return frame()[offset]; }
+
+    [[nodiscard]] static _Inln
+    uint16_t &frameStart() { return s_state.frameStart; }
+
+    [[nodiscard]] static _Inln
+    uint16_t &position() { return s_state.position; }
+
+    [[nodiscard]] static _Inln
+    uint16_t &attributeMask() { return s_state.attributeMask; }
+
+
+    static _Inln uint16_t align(uint16_t value, uint16_t alignment)
     {
-	    switch (c) {
+	    return value % alignment;
+    }
+
+    static _Inln uint16_t alignMissing(uint16_t value, uint16_t alignment)
+    {
+	    return alignment - align(value, alignment);
+    }
+
+    static _Inln void alignAdd(uint16_t &value, uint16_t alignment)
+    {
+	    value += alignMissing(value, alignment);
+    }
+
+    static _Inln uint16_t index(uint16_t x, uint16_t y)
+    {
+	    return y * vga::config().width + x;
+    }
+
+    static void internal_putchar(int c)
+    {
+	    switch (uint8_t(c)) {
 	    case '\n':
-		    // Add remaining offset to end of current row to position
-		    s_position += vga::Width - s_position % vga::Width;
+		    alignAdd(position(), vga::config().width);
 		    break;
 
 	    case '\t':
-		    s_position += vga::TabLength - s_position % vga::TabLength;
+		    alignAdd(position(), vga::config().tabLength);
 		    break;
 
 	    case '\b':
-		    if (s_position % vga::Width)
-			    s_frameBuffer[--s_position] = s_attributeMask;
+		    frame(--position()) = attributeMask();
 		    break;
 
 	    default:
-		    s_frameBuffer[s_position++] = s_attributeMask | uint8_t(c);
+		    frame(position()++) = attributeMask() | uint8_t(c);
 		    break;
 	    }
 
-	    if (s_position >= vga::Total) {
-		    // On overflow next row of the frame buffer is moved one row
-		    //  up, along with the spare empty row.
-		    s_position -= vga::Width;
+	    if (position() >= vga::config().total) {
+		    frameStart() += vga::config().width;
+		    position() -= vga::config().width;
 
-		    xos::memmove(
-			    s_frameBuffer,
-			    s_frameBuffer + vga::Width,
-			    vga::Total
-		    );
+		    if(uint16_t(frameStart() + position()) < frameStart())
+			    frameStart() = 0;
 	    }
     }
 
@@ -80,28 +105,95 @@ namespace tty {
     {
 	    setColor(vga::ColorAttribute());
 	    clear();
+
 	    return true;
     }
 
     void clear()
     {
-	    xos::memset(s_frameBuffer, s_attributeMask);
+	    frameStart() = 0;
+	    xos::memset(frame(), attributeMask(), FrameBufferSize);
 
-	    vga::setCursorPosition((s_position = 0));
-	    vga::renderFrameBuffer(s_frameBuffer);
+	    vga::setCursorPosition((position() = 0));
+	    vga::renderFrameBuffer(frame());
     }
 
     int getchar()
     {
-	    return ps2::kbd::getchar();
+	    using ps2::kbd::State;
+
+	    for (;;) {
+		    const auto key = ps2::kbd::getchar();
+		    bool update = false;
+
+		    switch (key) {
+		    case '7' | State::CharMask<State::E0>():
+			    position() -= align(position(),
+						vga::config().width);
+			    break;
+		    case '1' | State::CharMask<State::E0>():
+			    position() += alignMissing(position(),
+						       vga::config().width) - 1;
+			    break;
+		    case '9' | State::CharMask<State::E0>():
+			    frameStart() -= vga::config().total;
+			    update = true;
+			    break;
+		    case '3' | State::CharMask<State::E0>():
+			    frameStart() += vga::config().total;
+			    update = true;
+			    break;
+		    case '8' | State::CharMask<State::E0>():
+			    if (position() < vga::config().width) {
+				    frameStart() -= vga::config().width;
+				    update = true;
+			    }
+			    else
+				    position() -= vga::config().width;
+			    break;
+		    case '2' | State::CharMask<State::E0>():
+			    if (position() >= vga::config().total -
+					      vga::config().width) {
+				    frameStart() += vga::config().width;
+				    update = true;
+			    }
+			    else
+				    position() += vga::config().width;
+			    break;
+		    case '6' | State::CharMask<State::E0>():
+			    if (++position() >= vga::config().total) {
+				    frameStart() += vga::config().width;
+				    position() -= vga::config().width;
+				    update = true;
+			    }
+			    break;
+		    case '4' | State::CharMask<State::E0>():
+			    if (!position()--) {
+				    frameStart() -= vga::config().width;
+				    position() += vga::config().width;
+				    update = true;
+			    }
+			    break;
+
+		    default:
+			    return key;
+		    }
+
+		    if(uint16_t(frameStart() + position()) < frameStart())
+		    	frameStart() = 0;
+
+		    vga::setCursorPosition(position());
+		    if (update)
+			    vga::renderFrameBuffer(frame());
+	    }
     }
 
-    void putchar(char c)
+    void putchar(int c)
     {
 	    internal_putchar(c);
 
-	    vga::setCursorPosition(s_position);
-	    vga::renderFrameBuffer(s_frameBuffer);
+	    vga::setCursorPosition(position());
+	    vga::renderFrameBuffer(frame());
     }
 
     void write(const char *data, size_t size)
@@ -113,8 +205,8 @@ namespace tty {
 		    internal_putchar(*data++);
 	    while (--size);
 
-	    vga::setCursorPosition(s_position);
-	    vga::renderFrameBuffer(s_frameBuffer);
+	    vga::setCursorPosition(position());
+	    vga::renderFrameBuffer(frame());
     }
 
     void write(const char *data)
@@ -128,22 +220,22 @@ namespace tty {
 		    internal_putchar(character);
 	    while ((character = *++data));
 
-	    vga::setCursorPosition(s_position);
-	    vga::renderFrameBuffer(s_frameBuffer);
+	    vga::setCursorPosition(position());
+	    vga::renderFrameBuffer(frame());
     }
 
     void setColor(uint8_t color)
     {
-	    s_attributeMask = uint16_t(color) << 8u;
+	    attributeMask() = uint16_t(color) << 8u;
     }
 
-    void setCursor(uint16_t position)
+    void setCursor(uint16_t newPosition)
     {
-	    vga::setCursorPosition((s_position = position));
+	    vga::setCursorPosition((position() = newPosition));
     }
 
     void setCursor(uint8_t x, uint8_t y)
     {
-	    vga::setCursorPosition((s_position = y * vga::Width + x));
+	    vga::setCursorPosition((position() = index(x, y)));
     }
 }
