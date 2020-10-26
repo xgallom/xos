@@ -1,8 +1,8 @@
 The GNU General Public License, Version 2, June 1991 (GPLv2)
 ============================================================
 
-> Copyright (C) 2020 Milan Gallo
-> Trnavka 164, 930 32 Trnavka Slovak Republic
+> Copyright (C) 2020 Milan Gallo<br>
+> Trnávka 164, 930 32 Trnávka, Slovak Republic
 
 Everyone is permitted to copy and distribute verbatim copies of this license
 document, but changing it is not allowed.
