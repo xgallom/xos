@@ -14,11 +14,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-file(GLOB_RECURSE files "src/*.cpp")
+file(GLOB_RECURSE files "src/*.cpp" "src/*.S")
 
-add_library(arch_kernel_vga STATIC ${files})
-target_include_directories(arch_kernel_vga PUBLIC include)
+add_library(arch_kernel_memory STATIC ${files})
+target_include_directories(arch_kernel_memory PUBLIC include)
 
-target_link_libraries(arch_kernel_vga PRIVATE
-        arch_kernel_asm arch_kernel_multiboot libk
+target_link_libraries(arch_kernel_memory
+        PUBLIC
+        arch_kernel_asm
+
+        PRIVATE
+        arch_kernel_multiboot
+        libk
         )

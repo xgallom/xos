@@ -16,7 +16,7 @@
 
 file(GLOB_RECURSE files "src/*.cpp")
 
-add_library(arch_kernel_mbt STATIC ${files})
-target_include_directories(arch_kernel_mbt PUBLIC include)
+add_library(arch_kernel_multiboot STATIC ${files})
+target_include_directories(arch_kernel_multiboot PUBLIC include)
 
-target_link_libraries(arch_kernel_mbt PUBLIC libk)
+target_link_libraries(arch_kernel_multiboot PUBLIC libk)

@@ -14,44 +14,40 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 //
-// Created by xgallom on 5/25/20.
+// Created by xgallom on 10/26/20.
 //
 
-#include <xos/mbt.h>
-#include <xos/stdio.h>
+#include <xos/memory/mapping/physical.h>
+#include <xos/multiboot.h>
 
-namespace mbt {
-    static constexpr uint32_t MagicMask = 0x2bad0000;
+namespace mem::map::phy {
+    static List s_memoryMap;
 
-    static Multiboot::Object s_multiboot;
-
-
-    bool initialize(uint32_t magic, uint32_t *multiboot)
+    bool initialize()
     {
-	    if ((magic ^ MagicMask) >> 16u)
+	    const auto memoryMap = mbt::memoryMap();
+
+	    if (!memoryMap)
 		    return false;
 
-	    s_multiboot = *reinterpret_cast<Multiboot::Object *>(multiboot);
+	    s_memoryMap = {
+		    .head = {reinterpret_cast<const Entry *>(
+				     memoryMap->address
+			     )
+		    },
+		    .tail = {reinterpret_cast<const Entry *>(
+				     memoryMap->address + memoryMap->length
+			     )
+		    },
+	    };
 
 	    return true;
     }
 
-    const Multiboot::Object &entry()
+    List get()
     {
-	    return s_multiboot;
+	    return s_memoryMap;
     }
 
-    const Multiboot::MemoryMap *memoryMap()
-    {
-	    return s_multiboot.header.flags & (0x1u << 6u) ?
-		   &s_multiboot.memoryMap :
-		   nullptr;
-    }
 
-    const Multiboot::FrameBuffer *frameBuffer()
-    {
-	    return s_multiboot.header.flags & (0x1u << 12u) ?
-		   &s_multiboot.frameBuffer :
-		   nullptr;
-    }
 }

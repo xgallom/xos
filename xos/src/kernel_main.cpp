@@ -20,12 +20,13 @@
 #include "compiler_checks.h"
 
 #include <xos/descriptors/write.h>
-#include <xos/mbt/write.h>
+#include <xos/multiboot/write.h>
 #include <xos/extern-c.h>
 #include <xos/tty.h>
 #include <xos/vga.h>
 #include <xos/drivers/pic8259.h>
 #include <xos/drivers/ps2/keyboard.h>
+#include <xos/memory/mapping/physical/write.h>
 #include <xos/cpuid.h>
 #include <xos/stdio.h>
 #include <stdio.h>
@@ -71,24 +72,6 @@ static bool printWelcome()
 	return true;
 }
 
-struct MemoryMapEntry {
-	size_t size;
-	uint64_t baseAddress;
-	uint64_t length;
-	uint32_t type;
-
-	static const MemoryMapEntry *Get(uintptr_t address)
-	{
-		return reinterpret_cast<const MemoryMapEntry *>(address);
-	}
-
-	[[nodiscard]] const MemoryMapEntry *next(uintptr_t end) const
-	{
-		const auto next = uintptr_t(this) + size + 4;
-		return next < end ? Get(next) : nullptr;
-	}
-};
-
 void kernel_main(uint32_t magic, uint32_t *multiboot)
 {
 	if (!(
@@ -100,25 +83,18 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 		idt::loadIdtr() &&
 		pic8259::initialize() &&
 		ps2::kbd::initialize() &&
+		mem::map::phy::initialize() &&
 		cpuid::initialize()
 	))
 		return;
 
 	putchar('\n');
 
-	const auto end = mbt::memoryMap()->address + mbt::memoryMap()->length;
-	for (auto entry = MemoryMapEntry::Get(mbt::memoryMap()->address);
-	     entry; entry = entry->next(end))
-		xos::printf(
-			"size: {}, baseAddress: {x}, length: {x}, type: {}\n",
-			entry->size,
-			uintptr_t(entry->baseAddress),
-			size_t(entry->length),
-			entry->type
-		);
+	for(const auto entry : mem::map::phy::get())
+		xos::printf("{}\n", entry);
 
 	xos::printf("\n{}\n\n", &mbt::entry());
 
-	for (int n = getchar(); n != 'q'; n = getchar())
+	for (int n = getchar(); ; n = getchar())
 		putchar(n);
 }

@@ -20,7 +20,7 @@
 #include <xos/vga.h>
 #include <xos/port.h>
 #include <xos/string.h>
-#include <xos/mbt.h>
+#include <xos/multiboot.h>
 
 namespace vga {
     static constexpr uint16_t

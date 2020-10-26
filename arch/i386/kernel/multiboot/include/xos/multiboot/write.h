@@ -20,7 +20,7 @@
 #ifndef _XOS_ARCH_I386_KERNEL_MULTIBOOT_INCLUDE_XOS_MBT_WRITE_H
 #define _XOS_ARCH_I386_KERNEL_MULTIBOOT_INCLUDE_XOS_MBT_WRITE_H
 
-#include "../mbt.h"
+#include "../multiboot.h"
 #include <xos/write.h>
 
 namespace xos {

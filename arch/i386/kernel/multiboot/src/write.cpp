@@ -17,7 +17,7 @@
 // Created by xgallom on 5/29/20.
 //
 
-#include <xos/mbt/write.h>
+#include <xos/multiboot/write.h>
 
 namespace xos {
     bool write(const char *,

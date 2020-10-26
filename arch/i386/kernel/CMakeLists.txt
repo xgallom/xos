@@ -19,6 +19,7 @@ add_subdirectory(containers)
 add_subdirectory(cpuid)
 add_subdirectory(descriptors)
 add_subdirectory(drivers)
+add_subdirectory(memory)
 add_subdirectory(multiboot)
 add_subdirectory(tty)
 add_subdirectory(vga)
@@ -31,7 +32,8 @@ target_link_libraries(arch_kernel INTERFACE
         arch_kernel_cpuid
         arch_kernel_descriptors
         arch_kernel_drivers
-        arch_kernel_mbt
+        arch_kernel_memory
+        arch_kernel_multiboot
         arch_kernel_tty
         arch_kernel_vga
         )
