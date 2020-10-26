@@ -61,7 +61,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} \
 
 # Link Time Optimization
 
-set(CMAKE_AR "/usr/local/gcc/i686-elf/bin/i686-elf-gcc-ar")
+set(CMAKE_AR "${CMAKE_SYSROOT}/bin/i686-elf-gcc-ar")
 set(CMAKE_ASM_ARCHIVE_CREATE "<CMAKE_AR> qcs <TARGET> <LINK_FLAGS> <OBJECTS>")
 set(CMAKE_ASM_ARCHIVE_FINISH true)
 set(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> qcs <TARGET> <LINK_FLAGS> <OBJECTS>")

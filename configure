@@ -1,0 +1,8 @@
+#!/bin/bash
+
+cmake "$(dirname "$0")" \
+  -DCMAKE_BUILD_TYPE="$XOS_BUILD_TYPE" \
+  -DCMAKE_SYSROOT="$XOS_SYSROOT" \
+  -DCMAKE_C_COMPILER="$XOS_SYSROOT/bin/i686-elf-gcc" \
+  -DCMAKE_CXX_COMPILER="$XOS_SYSROOT/bin/i686-elf-g++" \
+  -DXOS_ARCH="$XOS_ARCH"
