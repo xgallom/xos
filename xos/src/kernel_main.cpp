@@ -19,18 +19,17 @@
 
 #include "compiler_checks.h"
 
-#include <xos/descriptors/write.h>
-#include <xos/multiboot/write.h>
-#include <xos/extern-c.h>
-#include <xos/tty.h>
-#include <xos/vga.h>
-#include <xos/drivers/pic8259.h>
-#include <xos/drivers/ps2/keyboard.h>
-#include <xos/memory/mapping/physical/write.h>
-#include <xos/cpuid.h>
-#include <xos/stdio.h>
-#include <stdio.h>
+//#include <xos/extern-c.h>
+//#include <xos/tty.h>
+//#include <xos/vga.h>
+//#include <xos/drivers/pic8259.h>
+//#include <xos/drivers/ps2/keyboard.h>
+//#include <xos/memory/mapping/physical/write.h>
+//#include <xos/cpuid.h>
+//#include <xos/stdio.h>
+//#include <stdio.h>
 
+/*
 _EXT_C
 
 void kernel_main(uint32_t magic, uint32_t *multiboot);
@@ -98,3 +97,4 @@ void kernel_main(uint32_t magic, uint32_t *multiboot)
 	for (int n = getchar(); ; n = getchar())
 		putchar(n);
 }
+*/

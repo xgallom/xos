@@ -32,9 +32,9 @@
 #endif
 
 
-#if !defined(__i386__)
+#if !defined(__i386__) && !defined(__x86_64__)
 
-#error "xos requires an ix86-elf compiler"
+#error "xos requires a valid compiler compiler"
 
 #endif
 

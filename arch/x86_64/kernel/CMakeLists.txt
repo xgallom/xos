@@ -14,21 +14,26 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-file(GLOB_RECURSE files "src/*")
+#add_subdirectory(asm)
+#add_subdirectory(containers)
+#add_subdirectory(cpuid)
+#add_subdirectory(descriptors)
+#add_subdirectory(drivers)
+#add_subdirectory(memory)
+add_subdirectory(stivale2)
+#add_subdirectory(tty)
+#add_subdirectory(vga)
 
-add_custom_target(image_root
-        cp -r "${CMAKE_SOURCE_DIR}/image_root/src" "${CMAKE_BINARY_DIR}/image_root_bin"
-        COMMAND
-        cp "${CMAKE_BINARY_DIR}/xos/xos" "${CMAKE_BINARY_DIR}/image_root_bin/xos.bin"
+add_library(arch_kernel INTERFACE)
 
-        COMMENT Preparing image root
-        DEPENDS xos
-        SOURCES ${files}
-        )
-
-add_custom_target(build_image_root
-        grub-mkrescue -o "${CMAKE_BINARY_DIR}/xos.iso" "${CMAKE_BINARY_DIR}/image_root_bin"
-
-        COMMENT Building grub image
-        DEPENDS image_root
+target_link_libraries(arch_kernel INTERFACE
+#        arch_kernel_asm
+#        arch_kernel_containers
+#        arch_kernel_cpuid
+#        arch_kernel_descriptors
+#        arch_kernel_drivers
+#        arch_kernel_memory
+        arch_kernel_stivale2
+#        arch_kernel_tty
+#        arch_kernel_vga
         )

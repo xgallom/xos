@@ -42,8 +42,8 @@ the prefix is not a root directory, you don't need sudo for make install
 commands.
 
 ```bash
-export PREFIX="/usr/local/gcc/i686-elf"
-export TARGET="i686-elf"
+export TARGET="x86_64-elf"
+export PREFIX="/usr/local/gcc/$TARGET"
 export PATH="$PREFIX/bin:$PATH"
 ```
 
