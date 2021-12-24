@@ -71,9 +71,9 @@ static struct Stivale::Header::Framebuffer framebuffer_hdr_tag = {
                 .id = Stivale::Header::TagId::Framebuffer,
                 .next = &terminal_hdr_tag.tag,
         },
-        .framebuffer_width  = 0,
-        .framebuffer_height = 0,
-        .framebuffer_bpp    = 0
+        .framebufferWidth  = 0,
+        .framebufferHeight = 0,
+        .framebufferBitsPerPixel = 0
 };
 
 // The stivale2 specification says we need to define a "header structure".
@@ -82,7 +82,7 @@ static struct Stivale::Header::Framebuffer framebuffer_hdr_tag = {
 // tell the compiler to put the following structure in said section.
 __attribute__((section(".stivale2hdr"), used))
 static struct Stivale::Header::Struct stivale_hdr = {
-        .entry_point = 0,
+        .entryPoint = 0,
         .stack = uintptr_t(stack) + sizeof(stack),
         // Bit 1, if set, causes the bootloader to return to us pointers in the
         // higher half, which we likely want since this is a higher half kernel.
@@ -113,8 +113,7 @@ _EXT_C
 void _start(const Stivale::Struct::Struct *stivale);
 _EXT_C_END
 
-size_t strlen(const char *data)
-{
+size_t strlen(const char *data) {
         if (!*data)
                 return 0;
 
@@ -136,14 +135,14 @@ void _start(const Stivale::Struct::Struct *stivale) {
                         asm ("hlt");
         }
 
-        auto term_write = terminal->term_write;
+        auto write = terminal->write;
 
         // We should now be able to call the above function pointer to print out
         // a simple "Hello World" to screen.
         const auto message =
-                "xos operating system v0.1.0\n"
+                "\x1b[31mxos operating system v0.1.0\n"
                 "Copyright (C) 2020 Milan Gallo <gallo.milan.jr@gmail.com>\n";
-        term_write(message, strlen(message));
+        write(message, strlen(message));
 
         // We're done, just hang...
         for (;;)

@@ -59,7 +59,7 @@ namespace Stivale_v2::Stivale {
                 using Tag = Stivale::Tag<TagId::Enum>;
 
                 struct Struct {
-                        uintptr_t entry_point;
+                        uintptr_t entryPoint;
                         uintptr_t stack;
                         uint64_t flags;
                         Tag *tags;
@@ -72,9 +72,9 @@ namespace Stivale_v2::Stivale {
 
                 struct Framebuffer {
                         Tag tag;
-                        uint16_t framebuffer_width;
-                        uint16_t framebuffer_height;
-                        uint16_t framebuffer_bpp;
+                        uint16_t framebufferWidth;
+                        uint16_t framebufferHeight;
+                        uint16_t framebufferBitsPerPixel;
                         uint16_t unused = 0;
                 };
 
@@ -87,9 +87,22 @@ namespace Stivale_v2::Stivale {
                 };
 
                 struct Terminal {
+                        enum CallbackType : uint64_t {
+                                DEC = 10u,
+                                Bell = 20u,
+                                PrivateId = 30u,
+                                StatusReport = 40u,
+                                PositionReport = 50u,
+                                KeyboardLeds = 60u,
+                                Mode = 70u,
+                                Linux = 80u,
+                        };
+
+                        using Callback = void (CallbackType, uint64_t, uint64_t, uint64_t);
+
                         Tag tag;
                         uint64_t flags;
-                        uintptr_t callback = 0;
+                        Callback *callback = nullptr;
                 };
 
                 struct SMP {
@@ -148,20 +161,26 @@ namespace Stivale_v2::Stivale {
                 };
 
                 struct PMR {
-                        uint64_t base;
-                        uint64_t length;
+                        enum Permission : uint64_t {
+                                Executable = 1u << 0u,
+                                Writable = 1u << 1u,
+                                Readable = 1u << 2u,
+                        };
+
+                        uintptr_t base;
+                        size_t length;
                         uint64_t permissions;
                 };
                 struct PMRs {
                         Tag tag;
-                        uint64_t entries;
-                        PMR pmrs[];
+                        size_t length;
+                        PMR items[];
                 };
 
                 struct KernelBaseAddress {
                         Tag tag;
-                        uint64_t physicalBaseAddress;
-                        uint64_t virtualBaseAddress;
+                        uintptr_t physicalBaseAddress;
+                        uintptr_t virtualBaseAddress;
                 };
 
                 struct CommandLine {
@@ -170,74 +189,89 @@ namespace Stivale_v2::Stivale {
                 };
 
                 struct MemoryMapEntry {
-                        uint64_t base;
-                        uint64_t length;
-                        uint32_t type;
+                        enum Type : uint32_t {
+                                Usable = 1,
+                                Reserved = 2,
+                                ACPIReclaimable = 3,
+                                ACPINvs = 4,
+                                BadMemory = 5,
+                                BootloaderReclaimable = 0x1000,
+                                Kernel = 0x1001,
+                                Framebuffer = 0x1002,
+                        };
+
+                        uintptr_t base;
+                        size_t length;
+                        Type type;
                         uint32_t unused;
                 };
 
                 struct MemoryMap {
                         Tag tag;
-                        uint64_t entries;
-                        MemoryMapEntry memmap[];
+                        size_t length;
+                        MemoryMapEntry items[];
                 };
 
                 struct Framebuffer {
+                        enum MemoryModel : uint8_t {
+                                RGB = 1u,
+                        };
+
                         Tag tag;
-                        uint64_t framebuffer_addr;
-                        uint16_t framebuffer_width;
-                        uint16_t framebuffer_height;
-                        uint16_t framebuffer_pitch;
-                        uint16_t framebuffer_bpp;
-                        uint8_t memory_model;
-                        uint8_t red_mask_size;
-                        uint8_t red_mask_shift;
-                        uint8_t green_mask_size;
-                        uint8_t green_mask_shift;
-                        uint8_t blue_mask_size;
-                        uint8_t blue_mask_shift;
+                        uint64_t framebufferAddress;
+                        uint16_t framebufferWidth;
+                        uint16_t framebufferHeight;
+                        uint16_t framebufferPitch;
+                        uint16_t framebufferBitsPerPixel;
+                        MemoryModel memoryModel;
+                        uint8_t redMaskSize;
+                        uint8_t redMaskShift;
+                        uint8_t greenMaskSize;
+                        uint8_t greenMaskShift;
+                        uint8_t blueMaskSize;
+                        uint8_t blueMaskShift;
                         uint8_t unused;
                 };
 
                 struct EDID {
                         Tag tag;
-                        uint64_t edid_size;
-                        uint8_t edid_information[];
+                        size_t length;
+                        uint8_t data[];
                 };
 
                 struct TextMode {
                         Tag tag;
-                        uint64_t address;
+                        uintptr_t address;
                         uint16_t unused;
                         uint16_t rows;
                         uint16_t cols;
-                        uint16_t bytes_per_char;
+                        uint16_t bytesPerChar;
                 };
 
                 using MTRR = Tag;
 
                 struct Terminal {
-                        using TermWrite = void (const char *string, size_t length);
+                        using TermWrite = void(const char *string, size_t length);
 
                         Tag tag;
                         uint32_t flags;
                         uint16_t cols;
                         uint16_t rows;
-                        TermWrite *term_write;
-                        uint64_t max_length;
+                        TermWrite *write;
+                        uint64_t maxLength;
                 };
 
                 struct Module {
                         static constexpr size_t StringSize = 128u;
 
-                        uint64_t begin;
-                        uint64_t end;
+                        uintptr_t begin;
+                        uintptr_t end;
                         char string[StringSize];
                 };
                 struct Modules {
                         Tag tag;
-                        uint64_t module_count;
-                        Module modules[];
+                        size_t length;
+                        Module items[];
                 };
 
                 struct RSDP {
@@ -251,23 +285,28 @@ namespace Stivale_v2::Stivale {
                 };
 
                 struct Firmware {
+                        enum Flags : uint64_t {
+                                UEFI = 0u,
+                                Bios,
+                        };
+
                         Tag tag;
-                        uint64_t flags;
+                        Flags flags;
                 };
 
                 struct EFISystemTable {
                         Tag tag;
-                        uint64_t system_table;
+                        uintptr_t systemTable;
                 };
 
                 struct KernelFile {
                         Tag tag;
-                        uint64_t kernel_file;
+                        uintptr_t kernelFile;
                 };
                 struct KernelFile_v2 {
                         Tag tag;
-                        uint64_t kernel_file;
-                        uint64_t kernel_size;
+                        uintptr_t kernelFile;
+                        size_t kernelSize;
                 };
 
                 struct GUID {
@@ -285,85 +324,58 @@ namespace Stivale_v2::Stivale {
 
                 struct KernelSlide {
                         Tag tag;
-                        uint64_t kernel_slide;
+                        uint64_t kernelSlide;
                 };
 
                 struct SMBIOS {
                         Tag tag;
                         uint64_t flags;
-                        uint64_t smbios_entry_32;
-                        uint64_t smbios_entry_64;
+                        uint64_t smbiosEntry32;
+                        uint64_t smbiosEntry64;
                 };
 
                 struct SMPInfo {
-                        uint32_t processor_id;
-                        uint32_t lapic_id;
-                        uint64_t target_stack;
-                        uint64_t goto_address;
-                        uint64_t extra_argument;
+                        uint32_t processorId;
+                        uint32_t lapicId;
+                        uint64_t targetStack;
+                        uintptr_t gotoAddress;
+                        uint64_t extraArgument;
                 };
                 struct SMP {
                         Tag tag;
                         uint64_t flags;
-                        uint32_t bsp_lapic_id;
+                        uint32_t bspLapicId;
                         uint32_t unused;
-                        uint64_t cpu_count;
-                        SMPInfo smp_info[];
+                        uint64_t cpuCount;
+                        SMPInfo smpInfo[];
                 };
 
                 struct PXEServerInfo {
                         Tag tag;
-                        uint32_t server_ip;
+                        uint32_t serverIp;
                 };
 
                 struct MMIO32UART {
                         Tag tag;
-                        uint64_t addr;
+                        uintptr_t address;
                 };
 
                 struct DeviceTreeBlob {
                         Tag tag;
-                        uint64_t addr;
-                        uint64_t size;
+                        uintptr_t address;
+                        size_t size;
                 };
 
                 struct HHDM {
                         Tag tag;
-                        uint64_t addr;
+                        uintptr_t address;
                 };
         }
 }
-
-#define STIVALE2_TERM_CB_DEC 10
-#define STIVALE2_TERM_CB_BELL 20
-#define STIVALE2_TERM_CB_PRIVATE_ID 30
-#define STIVALE2_TERM_CB_STATUS_REPORT 40
-#define STIVALE2_TERM_CB_POS_REPORT 50
-#define STIVALE2_TERM_CB_KBD_LEDS 60
-#define STIVALE2_TERM_CB_MODE 70
-#define STIVALE2_TERM_CB_LINUX 80
 
 #define STIVALE2_TERM_CTX_SIZE ((uint64_t)(-1))
 #define STIVALE2_TERM_CTX_SAVE ((uint64_t)(-2))
 #define STIVALE2_TERM_CTX_RESTORE ((uint64_t)(-3))
 #define STIVALE2_TERM_FULL_REFRESH ((uint64_t)(-4))
-
-
-#define STIVALE2_PMR_EXECUTABLE ((uint64_t)1 << 0)
-#define STIVALE2_PMR_WRITABLE   ((uint64_t)1 << 1)
-#define STIVALE2_PMR_READABLE   ((uint64_t)1 << 2)
-
-#define STIVALE2_MMAP_USABLE                 1
-#define STIVALE2_MMAP_RESERVED               2
-#define STIVALE2_MMAP_ACPI_RECLAIMABLE       3
-#define STIVALE2_MMAP_ACPI_NVS               4
-#define STIVALE2_MMAP_BAD_MEMORY             5
-#define STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE 0x1000
-#define STIVALE2_MMAP_KERNEL_AND_MODULES     0x1001
-#define STIVALE2_MMAP_FRAMEBUFFER            0x1002
-
-#define STIVALE2_FBUF_MMODEL_RGB 1
-
-#define STIVALE2_FIRMWARE_BIOS (1 << 0)
 
 #endif //_XOS_SRC_STIVALE2_H
