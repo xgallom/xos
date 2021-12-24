@@ -48,9 +48,8 @@ endif ()
 
 # Compilation Flags
 
-# -Werror -fpermissive
 set(COMMON_FLAGS "-fno-asynchronous-unwind-tables -fno-dwarf2-cfi-asm  \
--ffreestanding -Wall -Wextra -fpermissive \
+-ffreestanding -Wall -Wextra -Werror \
 -fno-stack-protector -fno-pic -mno-red-zone \
 -mcmodel=kernel -MMD")
 set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} ${COMMON_FLAGS}")
