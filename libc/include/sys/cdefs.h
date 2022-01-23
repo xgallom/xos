@@ -22,4 +22,6 @@
 
 #define __xos_libc 1
 
+#define _forever for (;;)
+
 #endif //_LIBC_INCLUDE_SYS_CDEFS_H

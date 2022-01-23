@@ -17,23 +17,7 @@
 // Created by Milan Gallo on 24/12/2021.
 //
 
-#ifndef _LIBC_INCLUDE_XOS_UTILITY_H
-#define _LIBC_INCLUDE_XOS_UTILITY_H
-
-#include <sys/cdefs.h>
-#include <cstddef>
-
-namespace xos {
-        constexpr size_t log2(size_t x)
-        {
-                size_t y = 0;
-                while (!(x & 1u)) {
-                        x >>= 1u;
-                        ++y;
-                }
-
-                return y;
-        }
-}
-
-#endif //_LIBC_INCLUDE_XOS_UTILITY_H
+#include <xos/attributes.h>
+#include <xos/utility.h>
+#include <xos/string.h>
+#include <cstdio>

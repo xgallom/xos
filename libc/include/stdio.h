@@ -14,26 +14,19 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //
 //
-// Created by Milan Gallo on 24/12/2021.
+// Created by Milan Gallo on 25/12/2021.
 //
 
-#ifndef _LIBC_INCLUDE_XOS_UTILITY_H
-#define _LIBC_INCLUDE_XOS_UTILITY_H
+#ifndef _LIBC_INCLUDE_STDIO_H
+#define _LIBC_INCLUDE_STDIO_H
 
 #include <sys/cdefs.h>
-#include <cstddef>
+#include <xos/attributes.h>
 
-namespace xos {
-        constexpr size_t log2(size_t x)
-        {
-                size_t y = 0;
-                while (!(x & 1u)) {
-                        x >>= 1u;
-                        ++y;
-                }
+_ExtC
 
-                return y;
-        }
-}
+int printf(const char *format, ...);
 
-#endif //_LIBC_INCLUDE_XOS_UTILITY_H
+_ExtCEnd
+
+#endif //_LIBC_INCLUDE_STDIO_H

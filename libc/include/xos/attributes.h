@@ -30,15 +30,15 @@
 
 #ifdef __cplusplus
 
-#define _EXT_C     extern "C" {
-#define _EXT_C_END }
+#define _ExtC    extern "C" {
+#define _ExtCEnd }
 
 #define _Rstr __restrict
 
 #else
 
-#define _EXT_C
-#define _EXT_C_END
+#define _ExtC
+#define _ExtCEnd
 
 #define _Rstr restrict
 

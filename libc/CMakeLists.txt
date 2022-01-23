@@ -14,10 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-file(GLOB_RECURSE files "src/*.cpp" "src/*.c")
+file(GLOB_RECURSE libk_files "src/libk/*.cpp" "src/libk/*.c")
 
 
-add_library(libk STATIC ${files})
+add_library(libk STATIC ${libk_files})
 target_include_directories(libk PUBLIC include)
 
 #target_link_libraries(libk PRIVATE arch_kernel)
