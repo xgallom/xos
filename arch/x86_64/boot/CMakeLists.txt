@@ -14,8 +14,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-add_subdirectory(boot)
-add_subdirectory(kernel)
+file(GLOB_RECURSE files "src/*.cpp" "src/*.c")
 
-add_library(arch INTERFACE)
-target_link_libraries(arch INTERFACE arch_boot arch_kernel)
+
+add_library(arch_boot STATIC ${files})
+target_include_directories(arch_boot PUBLIC include)
+
+target_link_libraries(arch_boot PUBLIC arch_kernel)
