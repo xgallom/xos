@@ -212,6 +212,6 @@ fn updateFile(arena: std.mem.Allocator, input_directory: []const u8, output_dire
 
     switch (update_stat) {
         .stale => std.log.info("updated file {s}", .{file_config.output_filename}),
-        .fresh => std.log.info("file {s} is already present", .{file_config.output_filename}),
+        .fresh => std.log.info("skipping file {s}", .{file_config.output_filename}),
     }
 }

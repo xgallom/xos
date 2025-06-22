@@ -68,6 +68,7 @@ pub fn build(b: *std.Build) void {
 
     const run_build_iso = b.addRunArtifact(build_iso);
     run_build_iso.step.dependOn(b.getInstallStep());
+    run_build_iso.has_side_effects = true;
 
     run_build_iso.addArg("--input-dir");
     run_build_iso.addDirectoryArg(b.path(""));

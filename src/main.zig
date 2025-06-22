@@ -65,68 +65,112 @@ fn main() noreturn {
     tty.initSystem();
     const t = tty.get(0);
 
-    t.putChar('C');
-    t.putChar('h');
-    t.putChar('a');
-    t.putChar('r');
-    t.putChar('s');
+    t.putStr("XOS\n");
 
-    const rsp = asm volatile (
-        \\ movq %rsp, %rax
-        : [ret] "={rax}" (-> u64),
-        :
-        : "rsp"
-    );
+    t.putStr("bootloader: ");
+    t.putStrz(limine.getBootloaderInfo().name);
+    t.putStr(" v");
+    t.putStrz(limine.getBootloaderInfo().version);
+    t.putStr("\n");
 
-    const rbp = asm volatile (
-        \\ movq %rbp, %rax
-        : [ret] "={rax}" (-> u64),
-        :
-        : "rbp"
-    );
+    t.putStr("cmdline: \"");
+    t.putStrz(limine.getExeCmdline().cmdline);
+    t.putStr("\"\n");
 
-    _ = putNumber(u64, .{ .x = 0, .y = 0 }, rbp - rsp);
-    const width: u64 = t.fb_res.x;
-    const height = t.fb_res.y;
+    t.putStr("firmware type: ");
+    t.putStr(limine.getFirmwareType().str());
+    t.putStr("\n");
 
-    var n: usize = 0;
-    // var pos: Coords = undefined;
-    // _ = &pos;
+    t.putStr("stack size: ");
+    t.putMemoryUnits(u64, limine.getStackSize().stack_size);
+    t.putStr("\n");
 
-    // _ = &pos;
-    n += putNumber(u64, .{ .x = n, .y = 1 }, width);
-    putChar(.{ .x = n, .y = 1 }, 'x');
-    n += 1;
-    n += putNumber(u64, .{ .x = n, .y = 1 }, height);
+    t.putStr("kernel virtual address: 0x");
+    t.putHexAlign(u64, limine.getHHDM().offset);
+    t.putStr("\n");
 
-    // for (limine.getFramebuffers()[0].videoModes(), 0..) |video_mode, video_mode_idx| {
-    //     if (video_mode_idx > 4) break;
-    //     n = 0;
-    //     n += putNumber(usize, .{ .x = n, .y = 2 + n }, video_mode_idx);
-    //     n += 1;
-    //     n += putNumber(u64, .{ .x = n, .y = 2 + n }, video_mode.width);
-    //     putChar(.{ .x = n, .y = 2 + n }, 'x');
-    //     n += 1;
-    //     n += putNumber(u64, .{ .x = n, .y = 2 + n }, video_mode.height);
-    // }
+    t.putStr("framebuffers:\n");
+    for (limine.getFramebuffers(), 0..) |*fb, n| {
+        t.putStr(" [");
+        t.putNumber(usize, n);
+        t.putStr("] ");
+        t.putNumber(u64, fb.fb.width);
+        t.putStr("x");
+        t.putNumber(u64, fb.fb.height);
+        t.putStr(" @ ");
+        t.putNumber(u64, fb.fb.bpp);
+        t.putStr("bpp, tty ");
+        t.putNumber(u64, t.screen_size.x);
+        t.putStr("x");
+        t.putNumber(u64, t.screen_size.y);
+        t.putStr("\n");
 
-    // pos.x += putNumber(u64, pos, t.fb_res.x);
-    // putChar(pos, 'x');
-    // pos.x += 1;
-    // pos.x += putNumber(u64, pos, t.fb_res.y);
-    //
-    // pos.x = 0;
-    // pos.y += 1;
+        // for (fb.videoModes()) |*vm| {
+        //     if (vm.width == 0 or vm.height == 0) continue;
+        //     t.putStr("  - ");
+        //     t.putNumber(u64, vm.width);
+        //     t.putStr("x");
+        //     t.putNumber(u64, vm.height);
+        //     t.putStr(" @ ");
+        //     t.putNumber(u64, vm.bpp);
+        //     t.putStr("bpp\n");
+        // }
+    }
 
-    // pos.x += putNumber(u64, pos, t.screen_size.x);
-    // putChar(pos, 'x');
-    // pos.x += 1;
-    // pos.x += putNumber(u64, pos, t.screen_size.y);
+    const exe_file = limine.getExeFile();
+    t.putStr("executable: ");
+    t.putStrz(exe_file.f.path);
+    t.putStr(" at 0x");
+    t.putHexAlign(usize, @intFromPtr(exe_file.f.address));
+    t.putStr(", size ");
+    t.putMemoryUnits(u64, exe_file.f.size);
+    t.putStr("\n");
+    t.putStr(" mbr_disk=");
+    t.putNumber(u32, exe_file.f.mbr_disk_id);
+    t.putStr(" mbr_part=");
+    t.putNumber(u32, exe_file.f.partition_index);
+    t.putStr("\n");
+    t.putStr(" gpt_disk=");
+    t.putUuid(limine.Uuid, exe_file.gptDiskUuid());
+    t.putStr("\n");
+    t.putStr(" gpt_part=");
+    t.putUuid(limine.Uuid, exe_file.gptPartUuid());
+    t.putStr("\n");
+    t.putStr(" fs_part=");
+    t.putUuid(limine.Uuid, exe_file.fsPartUuid());
+    t.putStr("\n");
 
-    // logFn(.info, Scope, "debug", .{});
+    t.putStr("memory mapping:\n");
+    for (limine.getMemMap().entries(), 0..) |*entry, n| {
+        _ = &entry;
+        t.putStr(" [");
+        t.putNumberAlign(usize, n, 2);
+        t.putStr("] {");
+        t.putHexAlign(u64, entry.e.base);
+        t.putStr("-");
+        t.putHexAlign(u64, entry.e.base + entry.e.length);
+        t.putStr("} size ");
+        t.putMemoryUnits(u64, entry.e.length);
+        t.putStr(", ");
+        t.putStr(entry.entryType().str());
+        t.putStr("\n");
+    }
 
-    // t.updateScreen();
-    // _ = putNumber(usize, .{ .x = 0, .y = 5 }, t.updateFramebuffer());
+    const scroll = true;
+
+    if (scroll) {
+        const max_screen_y = t.screen_offset.y + 1;
+        t.screen_offset.y = 0;
+
+        while (true) {
+            t.update();
+            for (0..(1 << 24)) |_| asm volatile ("pause");
+            t.screen_offset.y = (t.screen_offset.y + 1) % max_screen_y;
+            // t.screen_offset.y = if (t.screen_offset.y == 0) max_screen_y - 1 else t.screen_offset.y - 1;
+        }
+    } else {
+        t.update();
+    }
 
     while (true) {
         asm volatile ("hlt");
