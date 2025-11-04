@@ -1,7 +1,6 @@
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
-    const host_target = b.resolveTargetQuery(.{});
     const target = b.resolveTargetQuery(.{
         .cpu_arch = .x86_64,
         .os_tag = .freestanding,
@@ -9,7 +8,6 @@ pub fn build(b: *std.Build) void {
         .cpu_features_sub = std.Target.x86.featureSet(&[_]std.Target.x86.Feature{.sse}),
     });
 
-    const host_optimize = std.builtin.OptimizeMode.Debug;
     const optimize = b.standardOptimizeOption(.{});
 
     // std.log.info("host_target: {any}", .{host_target.result});
@@ -33,12 +31,6 @@ pub fn build(b: *std.Build) void {
     kernel_mod.addCSourceFile(.{ .file = b.path("src/ext/limine.c") });
     kernel_mod.addCSourceFile(.{ .file = b.path("src/descriptors/isr.S") });
 
-    const build_iso_mod = b.createModule(.{
-        .root_source_file = b.path("src/build_iso.zig"),
-        .target = host_target,
-        .optimize = host_optimize,
-    });
-
     // const lib = b.addLibrary(.{
     //     .linkage = .static,
     //     .name = "xos",
@@ -58,7 +50,11 @@ pub fn build(b: *std.Build) void {
 
     const build_iso = b.addExecutable(.{
         .name = "xos-build-iso",
-        .root_module = build_iso_mod,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/build_iso.zig"),
+            .target = b.graph.host,
+            .optimize = optimize,
+        }),
     });
 
     const run_build_iso = b.addRunArtifact(build_iso);
@@ -72,7 +68,7 @@ pub fn build(b: *std.Build) void {
     run_build_iso.addArg("--xos-bin-dir");
     run_build_iso.addArg(b.getInstallPath(.bin, ""));
 
-    const build_iso_step = b.step("build-iso", "Build bootable iso image");
+    const build_iso_step = b.step("iso", "Build bootable iso image");
     build_iso_step.dependOn(&run_build_iso.step);
 
     // const exe_unit_tests = b.addTest(.{
