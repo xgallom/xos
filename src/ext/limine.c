@@ -56,5 +56,11 @@ struct limine_executable_file_request limine_executable_file_request = {
 	.response = NULL,
 };
 
+/*struct limine_rsdp_request limine_rsdp_request = {*/
+/*	.id = LIMINE_RSDP_REQUEST,*/
+/*	.revision = 0,*/
+/*	.response = NULL,*/
+/*};*/
+
 LIMINE_REQUESTS_END_MARKER
 

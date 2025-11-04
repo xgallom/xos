@@ -1,5 +1,5 @@
 const std = @import("std");
-const fatal = std.zig.fatal;
+const fatal = std.process.fatal;
 
 const usage =
     \\Usage: ./build_iso [options]
@@ -29,7 +29,11 @@ fn parseArguments(allocator: std.mem.Allocator) !?Arguments {
         while (n < args.len) : (n += 1) {
             const arg = args[n];
             if (std.mem.eql(u8, "-h", arg) or std.mem.eql(u8, "--help", arg)) {
-                try std.io.getStdOut().writeAll(usage);
+                var stdout_buf: [256]u8 = undefined;
+                var stdout_writer = std.fs.File.stdout().writer(&stdout_buf);
+                const stdout = &stdout_writer.interface;
+                try stdout.writeAll(usage);
+                try stdout.flush();
                 return null;
             } else if (std.mem.eql(u8, "--input-dir", arg)) {
                 n += 1;
@@ -203,11 +207,21 @@ pub fn main() !void {
     }
 }
 
-fn updateFile(arena: std.mem.Allocator, input_directory: []const u8, output_directory: []const u8, file_config: FileConfig) !void {
+fn updateFile(
+    arena: std.mem.Allocator,
+    input_directory: []const u8,
+    output_directory: []const u8,
+    file_config: FileConfig,
+) !void {
     const input_path = try std.fs.path.join(arena, &.{ input_directory, file_config.input_filename });
     const output_path = try std.fs.path.join(arena, &.{ output_directory, file_config.output_filename });
     const update_stat = std.fs.updateFileAbsolute(input_path, output_path, .{}) catch |err| {
-        fatal("failed installing for {s}: {s}\n- copy\n  from: {s}\n  to: {s}", .{ file_config.output_filename, @errorName(err), input_path, output_path });
+        fatal("failed installing for {s}: {s}\n- copy\n  from: {s}\n  to: {s}", .{
+            file_config.output_filename,
+            @errorName(err),
+            input_path,
+            output_path,
+        });
     };
 
     switch (update_stat) {

@@ -1,7 +1,7 @@
 const std = @import("std");
 const assert = std.debug.assert;
 
-const limine = @import("ext/limine.zig");
+const limine = @import("ext.zig").limine;
 
 fb_data: []u8,
 text_buf: []u8,
@@ -55,11 +55,9 @@ pub fn initSystem() void {
         state.text_buf = &text_bufs[n];
         state.screen_buf = &screen_bufs[n];
         state.dbl_buf = dbl_bufs[n][0..state.fb_data.len];
-        // state.dbl_buf = state.fb_data;
 
         state.fb_res = .{ .x = framebuffer.fb.width, .y = framebuffer.fb.height };
-        state.char_res.x = default_char_res.x;
-        state.char_res.y = default_char_res.y;
+        state.char_res = default_char_res;
         state.screen_size = .{
             .x = state.fb_res.x / state.char_res.x,
             .y = state.fb_res.y / state.char_res.y,
@@ -73,10 +71,8 @@ pub fn initSystem() void {
             .y = (state.fb_res.y - state.char_res.y * state.screen_size.y) / 2,
         };
 
-        state.screen_offset.x = 0;
-        state.screen_offset.y = 0;
-        state.cursor_pos.x = 0;
-        state.cursor_pos.y = 0;
+        state.screen_offset = .{};
+        state.cursor_pos = .{};
 
         state.text_buf_start = 0;
         state.text_buf_end = 0;
@@ -247,9 +243,10 @@ pub fn update(self: *const Self) void {
         }
     }
 
-    for (self.fb_data, self.dbl_buf) |*fb, dbl| {
-        fb.* = dbl;
-    }
+    @memcpy(self.fb_data, self.dbl_buf);
+    // for (self.fb_data, self.dbl_buf) |*fb, dbl| {
+    //     fb.* = dbl;
+    // }
 }
 
 fn textIdxInc(idx: usize) usize {

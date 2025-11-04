@@ -1,14 +1,15 @@
+const std = @import("std");
+const assert = std.debug.assert;
+
 pub const c = @cImport({
     @cDefine("LIMINE_API_REVISION", "3");
     @cInclude("limine.h");
 });
 
-pub usingnamespace c;
-
 pub const BootloaderInfo = c.limine_bootloader_info_response;
 pub const ExeCmdline = c.limine_executable_cmdline_response;
 
-pub const FirmwareType = struct {
+pub const FirmwareType = extern struct {
     type: c.limine_firmware_type_response,
 
     const Self = @This();
@@ -27,7 +28,7 @@ pub const FirmwareType = struct {
 pub const StackSize = c.limine_stack_size_request;
 pub const HigherHalfDirectMap = c.limine_hhdm_response;
 
-pub const Framebuffer = struct {
+pub const Framebuffer = extern struct {
     fb: c.limine_framebuffer,
 
     const Self = @This();
@@ -53,7 +54,7 @@ pub const Framebuffer = struct {
     }
 };
 
-pub const MemMap = struct {
+pub const MemMap = extern struct {
     mm: c.limine_memmap_response,
 
     const Self = @This();
@@ -99,7 +100,20 @@ pub const MemMap = struct {
     };
 };
 
-pub const File = struct {
+pub const Rsdp = extern struct {
+    signature: [8]u8,
+    checksum: u8,
+    oemid: [6]u8,
+    revision: u8,
+    rsdt_address: u32,
+
+    length: u32,
+    xsdt_address: u64,
+    extended_checksum: u8,
+    reserved: [3]u8,
+};
+
+pub const File = extern struct {
     f: c.limine_file,
 
     const Self = @This();
@@ -131,6 +145,7 @@ pub const hhdm_request = @extern(*const c.limine_hhdm_request, .{ .name = "limin
 pub const framebuffer_request = @extern(*const c.limine_framebuffer_request, .{ .name = "limine_framebuffer_request" });
 pub const memmap_request = @extern(*const c.limine_memmap_request, .{ .name = "limine_memmap_request" });
 pub const executable_file_request = @extern(*const c.limine_executable_file_request, .{ .name = "limine_executable_file_request" });
+// pub const rsdp_request = @extern(*const c.limine_rsdp_request, .{ .name = "limine_rsdp_request" });
 
 pub fn getBootloaderInfo() *const BootloaderInfo {
     return @ptrCast(bootloader_info_request.response);
@@ -163,3 +178,6 @@ pub fn getMemMap() *const MemMap {
 pub fn getExeFile() *const File {
     return @ptrCast(executable_file_request.response.*.executable_file);
 }
+// pub fn getRSDP() *const Rsdp {
+//     return @ptrFromInt(rsdp_request.response.*.address);
+// }

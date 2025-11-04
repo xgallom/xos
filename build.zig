@@ -5,10 +5,11 @@ pub fn build(b: *std.Build) void {
     const target = b.resolveTargetQuery(.{
         .cpu_arch = .x86_64,
         .os_tag = .freestanding,
-        .cpu_model = .baseline,
-        .cpu_features_sub = std.Target.x86.featureSet(&[_]std.Target.x86.Feature{.mmx}),
+        .cpu_features_add = std.Target.x86.featureSet(&[_]std.Target.x86.Feature{.soft_float}),
+        .cpu_features_sub = std.Target.x86.featureSet(&[_]std.Target.x86.Feature{.sse}),
     });
 
+    const host_optimize = std.builtin.OptimizeMode.Debug;
     const optimize = b.standardOptimizeOption(.{});
 
     // std.log.info("host_target: {any}", .{host_target.result});
@@ -24,22 +25,18 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
+        .link_libc = false,
         .code_model = .kernel,
     });
 
     kernel_mod.addIncludePath(b.path("limine"));
     kernel_mod.addCSourceFile(.{ .file = b.path("src/ext/limine.c") });
+    kernel_mod.addCSourceFile(.{ .file = b.path("src/descriptors/isr.S") });
 
     const build_iso_mod = b.createModule(.{
         .root_source_file = b.path("src/build_iso.zig"),
         .target = host_target,
-        .optimize = optimize,
-    });
-
-    const png_to_bin_mod = b.createModule(.{
-        .root_source_file = b.path("src/png_to_bin.zig"),
-        .target = host_target,
-        .optimize = optimize,
+        .optimize = host_optimize,
     });
 
     // const lib = b.addLibrary(.{
@@ -54,8 +51,6 @@ pub fn build(b: *std.Build) void {
     const kernel = b.addExecutable(.{
         .name = "xos",
         .root_module = kernel_mod,
-        .link_libc = false,
-        .code_model = .kernel,
     });
 
     kernel.setLinkerScript(b.path("linker.ld"));
@@ -79,21 +74,6 @@ pub fn build(b: *std.Build) void {
 
     const build_iso_step = b.step("build-iso", "Build bootable iso image");
     build_iso_step.dependOn(&run_build_iso.step);
-
-    const png_to_bin = b.addExecutable(.{
-        .name = "xos-png-to-bin",
-        .root_module = png_to_bin_mod,
-    });
-
-    const run_png_to_bin = b.addRunArtifact(png_to_bin);
-    run_png_to_bin.step.dependOn(b.getInstallStep());
-
-    if (b.args) |args| {
-        run_png_to_bin.addArgs(args);
-    }
-
-    const png_to_bin_step = b.step("png-to-bin", "Convert png of a font to a binary file");
-    png_to_bin_step.dependOn(&run_png_to_bin.step);
 
     // const exe_unit_tests = b.addTest(.{
     //     .root_module = kernel_mod,
